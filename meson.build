@@ -1,5 +1,5 @@
 project(
-  'kmc', 'c',
+  'gmpd', 'c',
   version: '0.0.1',
   meson_version: '>= 0.50.0',
 )
