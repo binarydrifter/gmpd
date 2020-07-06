@@ -146,25 +146,9 @@ gmpd_song_response_feed_pair(GMpdResponse *_self,
 }
 
 static void
-gmpd_song_response_feed_binary(GMpdResponse *self G_GNUC_UNUSED,
-                               GMpdVersion *version G_GNUC_UNUSED,
-                               GBytes *bytes G_GNUC_UNUSED)
-{
-	g_critical("%s: GMpdSong does not receive binary data", __func__);
-}
-
-static gsize
-gmpd_song_response_get_remaining_binary(GMpdResponse *self G_GNUC_UNUSED)
-{
-	return 0;
-}
-
-static void
 gmpd_song_response_iface_init(GMpdResponseIface *iface)
 {
 	iface->feed_pair = gmpd_song_response_feed_pair;
-	iface->feed_binary = gmpd_song_response_feed_binary;
-	iface->get_remaining_binary = gmpd_song_response_get_remaining_binary;
 }
 
 static void

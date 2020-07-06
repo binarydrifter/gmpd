@@ -41,8 +41,35 @@ static gboolean deserialize_binary(GMpdResponse *self,
                                    GError **error);
 
 static void
-gmpd_response_default_init(GMpdResponseIface *iface G_GNUC_UNUSED)
+gmpd_response_default_feed_pair(GMpdResponse *self,
+                                GMpdVersion *version G_GNUC_UNUSED,
+                                const gchar *key G_GNUC_UNUSED,
+                                const gchar *value G_GNUC_UNUSED)
 {
+	g_critical("%s does not implement GMpdResponse::feed_pair()", G_OBJECT_TYPE_NAME(self));
+}
+
+static void
+gmpd_response_default_feed_binary(GMpdResponse *self,
+                                  GMpdVersion *version G_GNUC_UNUSED,
+                                  GBytes *binary G_GNUC_UNUSED)
+{
+	g_critical("%s does not implement GMpdResponse::feed_binary()", G_OBJECT_TYPE_NAME(self));
+}
+
+static gsize
+gmpd_response_default_get_remaining_binary(GMpdResponse *self)
+{
+	g_critical("%s does not implement GMpdResponse::get_remaining_binary()", G_OBJECT_TYPE_NAME(self));
+	return 0;
+}
+
+static void
+gmpd_response_default_init(GMpdResponseIface *iface)
+{
+	iface->feed_pair = gmpd_response_default_feed_pair;
+	iface->feed_binary = gmpd_response_default_feed_binary;
+	iface->get_remaining_binary = gmpd_response_default_get_remaining_binary;
 }
 
 static void
