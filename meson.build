@@ -1,7 +1,7 @@
 project(
   'gmpd', 'c',
   version: '0.0.1',
-  meson_version: '>= 0.50.0',
+  meson_version: '>= 0.49.0'
 )
 
 add_global_arguments(

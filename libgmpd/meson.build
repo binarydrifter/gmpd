@@ -5,7 +5,7 @@ libgmpd_dependencies = [
   dependency('gio-unix-2.0'),
 ]
 
-libgmpd_include_dirs = ['.']
+libgmpd_include_dirs = include_directories('.')
 
 libgmpd_version = '0.0.1'
 
