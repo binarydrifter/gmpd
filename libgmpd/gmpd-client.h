@@ -25,6 +25,7 @@
 
 #include <gio/gio.h>
 #include <gmpd-song.h>
+#include <gmpd-status.h>
 #include <gmpd-version.h>
 
 G_BEGIN_DECLS
@@ -92,6 +93,15 @@ void gmpd_client_currentsong_async(GMpdClient *self,
                                    gpointer user_data);
 
 GMpdSong *gmpd_client_currentsong_finish(GMpdClient *self, GAsyncResult *result, GError **error);
+
+GMpdStatus *gmpd_client_status(GMpdClient *self, GCancellable *cancellable, GError **error);
+
+void gmpd_client_status_async(GMpdClient *self,
+                              GCancellable *cancellable,
+                              GAsyncReadyCallback callback,
+                              gpointer user_data);
+
+GMpdStatus *gmpd_client_status_finish(GMpdClient *self, GAsyncResult *result, GError **error);
 
 G_END_DECLS
 

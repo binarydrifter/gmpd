@@ -23,6 +23,7 @@
 #include "gmpd-object.h"
 #include "gmpd-response.h"
 #include "gmpd-song.h"
+#include "gmpd-status.h"
 #include "gmpd-version.h"
 
 #define LOCK(client) G_STMT_START { \
@@ -665,6 +666,82 @@ gmpd_client_currentsong_finish(GMpdClient *self, GAsyncResult *result, GError **
 	g_return_val_if_fail(retval == NULL || GMPD_IS_SONG(retval), NULL);
 
 	return retval ? GMPD_SONG(retval) : NULL;
+}
+
+GMpdStatus *
+gmpd_client_status(GMpdClient *self, GCancellable *cancellable, GError **error)
+{
+	GTask *task;
+	gboolean result;
+	GMpdStatus *status;
+
+	g_return_val_if_fail(GMPD_IS_CLIENT(self), NULL);
+	g_return_val_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable), NULL);
+	g_return_val_if_fail(error == NULL || *error == NULL, NULL);
+
+	LOCK(self);
+
+	task = gmpd_client_start_task(self,
+	                              TRUE,
+	                              "status\n",
+	                              GMPD_RESPONSE(gmpd_status_new()),
+	                              cancellable,
+	                              NULL, NULL);
+
+	result = gmpd_client_do_sync(self, G_IO_IN | G_IO_OUT, TRUE, cancellable, error);
+	if (!result) {
+		g_object_unref(task);
+		UNLOCK(self);
+		return NULL;
+	}
+
+	status = g_task_propagate_pointer(task, error);
+	g_object_unref(task);
+
+	UNLOCK(self);
+
+	return status;
+}
+
+void
+gmpd_client_status_async(GMpdClient *self,
+                         GCancellable *cancellable,
+                         GAsyncReadyCallback callback,
+                         gpointer user_data)
+{
+	GTask *task;
+
+	g_return_if_fail(GMPD_IS_CLIENT(self));
+	g_return_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable));
+	g_return_if_fail(callback != NULL || user_data == NULL);
+
+	task = gmpd_client_start_task(self,
+	                              FALSE,
+	                              "status\n",
+	                              GMPD_RESPONSE(gmpd_status_new()),
+	                              cancellable,
+	                              callback,
+	                              user_data);
+	g_object_unref(task);
+}
+
+GMpdStatus *
+gmpd_client_status_finish(GMpdClient *self, GAsyncResult *result, GError **error)
+{
+	GTask *task;
+	gpointer retval;
+
+	g_return_val_if_fail(GMPD_IS_CLIENT(self), NULL);
+	g_return_val_if_fail(G_IS_TASK(result), NULL);
+	g_return_val_if_fail(error == NULL || *error == NULL, NULL);
+
+	task = G_TASK(result);
+	g_return_val_if_fail(g_task_get_source_object(task) == self, NULL);
+
+	retval = g_task_propagate_pointer(task, error);
+	g_return_val_if_fail(retval == NULL || GMPD_IS_STATUS(retval), NULL);
+
+	return retval ? GMPD_STATUS(retval) : NULL;
 }
 
 static void
