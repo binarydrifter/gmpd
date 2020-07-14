@@ -58,9 +58,8 @@ gmpd_response_default_feed_binary(GMpdResponse *self,
 }
 
 static gsize
-gmpd_response_default_get_remaining_binary(GMpdResponse *self)
+gmpd_response_default_get_remaining_binary(GMpdResponse *self G_GNUC_UNUSED)
 {
-	g_critical("%s does not implement GMpdResponse::get_remaining_binary()", G_OBJECT_TYPE_NAME(self));
 	return 0;
 }
 
