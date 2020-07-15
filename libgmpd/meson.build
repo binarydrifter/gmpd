@@ -19,6 +19,8 @@ libgmpd_sources = [
   'gmpd-object.h',
   'gmpd-option-state.c',
   'gmpd-playback-state.c',
+  'gmpd-protocol.c',
+  'gmpd-protocol.h',
   'gmpd-response-priv.h',
   'gmpd-response.c',
   'gmpd-response.h',

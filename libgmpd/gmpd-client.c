@@ -21,6 +21,7 @@
 
 #include "gmpd-client.h"
 #include "gmpd-object.h"
+#include "gmpd-protocol.h"
 #include "gmpd-response.h"
 #include "gmpd-song.h"
 #include "gmpd-status.h"
@@ -43,8 +44,6 @@
 
 #define IS_CANCELLED(err) \
 	g_error_matches((err), G_IO_ERROR, G_IO_ERROR_CANCELLED)
-
-typedef struct _TaskData TaskData;
 
 static void gmpd_client_initable_iface_init(GInitableIface *iface);
 static void gmpd_client_async_initable_iface_init(GAsyncInitable *iface G_GNUC_UNUSED);
@@ -74,8 +73,7 @@ static void gmpd_client_destroy_output_source(GMpdClient *self);
 
 static GTask *gmpd_client_start_task(GMpdClient *self,
                                      gboolean have_lock,
-                                     const gchar *command,
-                                     GMpdResponse *response,
+                                     GMpdTaskData *task_data,
                                      GCancellable *cancellable,
                                      GAsyncReadyCallback callback,
                                      gpointer user_data);
@@ -89,9 +87,6 @@ static gboolean gmpd_client_do_sync(GMpdClient *self,
                                     GCancellable *cancellable,
                                     GError **error);
 static gboolean gmpd_client_on_socket_ready(GSocket *socket, GIOCondition condition, GMpdClient *self);
-
-static TaskData *task_data_new(const gchar *command, GMpdResponse *response);
-static void task_data_free(TaskData *data);
 
 enum {
 	PROP_NONE,
@@ -125,11 +120,6 @@ struct _GMpdClient {
 
 struct _GMpdClientClass {
 	GMpdObjectClass __base__;
-};
-
-struct _TaskData {
-	gchar *command;
-	GMpdResponse *response;
 };
 
 G_DEFINE_TYPE_WITH_CODE(GMpdClient, gmpd_client, GMPD_TYPE_OBJECT,
@@ -533,8 +523,7 @@ gmpd_client_close(GMpdClient *self, GCancellable *cancellable, GError **error)
 
 	task = gmpd_client_start_task(self,
 	                              TRUE,
-	                              "close\n",
-	                              NULL,
+	                              gmpd_protocol_close(),
 	                              cancellable,
 	                              NULL, NULL);
 
@@ -568,8 +557,7 @@ gmpd_client_close_async(GMpdClient *self,
 
 	task = gmpd_client_start_task(self,
 	                              FALSE,
-	                              "close\n",
-	                              NULL,
+	                              gmpd_protocol_close(),
 	                              cancellable,
 	                              callback,
 	                              user_data);
@@ -606,8 +594,7 @@ gmpd_client_currentsong(GMpdClient *self, GCancellable *cancellable, GError **er
 
 	task = gmpd_client_start_task(self,
 	                              TRUE,
-	                              "currentsong\n",
-	                              GMPD_RESPONSE(gmpd_song_new()),
+	                              gmpd_protocol_currentsong(),
 	                              cancellable,
 	                              NULL, NULL);
 
@@ -641,8 +628,7 @@ gmpd_client_currentsong_async(GMpdClient *self,
 
 	task = gmpd_client_start_task(self,
 	                              FALSE,
-	                              "currentsong\n",
-	                              GMPD_RESPONSE(gmpd_song_new()),
+	                              gmpd_protocol_currentsong(),
 	                              cancellable,
 	                              callback,
 	                              user_data);
@@ -683,8 +669,7 @@ gmpd_client_status(GMpdClient *self, GCancellable *cancellable, GError **error)
 
 	task = gmpd_client_start_task(self,
 	                              TRUE,
-	                              "status\n",
-	                              GMPD_RESPONSE(gmpd_status_new()),
+	                              gmpd_protocol_status(),
 	                              cancellable,
 	                              NULL, NULL);
 
@@ -717,8 +702,7 @@ gmpd_client_status_async(GMpdClient *self,
 
 	task = gmpd_client_start_task(self,
 	                              FALSE,
-	                              "status\n",
-	                              GMPD_RESPONSE(gmpd_status_new()),
+	                              gmpd_protocol_status(),
 	                              cancellable,
 	                              callback,
 	                              user_data);
@@ -1098,24 +1082,20 @@ gmpd_client_destroy_output_source(GMpdClient *self)
 static GTask *
 gmpd_client_start_task(GMpdClient *self,
                        gboolean have_lock,
-                       const gchar *command,
-                       GMpdResponse *response,
+		       GMpdTaskData *task_data,
                        GCancellable *cancellable,
                        GAsyncReadyCallback callback,
                        gpointer user_data)
 {
 	GTask *task;
-	TaskData *data;
 
 	g_return_val_if_fail(GMPD_IS_CLIENT(self), NULL);
-	g_return_val_if_fail(command != NULL, NULL);
-	g_return_val_if_fail(response == NULL || GMPD_IS_RESPONSE(response), NULL);
+	g_return_val_if_fail(task_data != NULL, NULL);
 	g_return_val_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable), NULL);
 	g_return_val_if_fail(callback != NULL || user_data == NULL, NULL);
 
 	task = g_task_new(self, cancellable, callback, user_data);
-	data = task_data_new(command, response);
-	g_task_set_task_data(task, data, (GDestroyNotify)task_data_free);
+	g_task_set_task_data(task, task_data, (GDestroyNotify)gmpd_task_data_unref);
 
 	if (!have_lock)
 		LOCK(self);
@@ -1133,8 +1113,8 @@ gmpd_client_start_task(GMpdClient *self,
 	g_queue_push_tail(self->task_queue, g_object_ref(task));
 
 	g_output_stream_write(G_OUTPUT_STREAM(self->output_stream),
-	                      data->command,
-	                      strlen(data->command),
+	                      task_data->command,
+	                      strlen(task_data->command),
 	                      NULL,
 	                      NULL);
 
@@ -1217,7 +1197,7 @@ gmpd_client_do_fill(GMpdClient *self, GCancellable *cancellable, GError **error)
 	g_return_val_if_fail(error == NULL || *error == NULL, FALSE);
 
 	while ((task = g_queue_peek_head(self->task_queue))) {
-		TaskData *data = g_task_get_task_data(task);
+		GMpdTaskData *data = g_task_get_task_data(task);
 		GError *err = NULL;
 		gboolean result;
 
@@ -1304,28 +1284,5 @@ gmpd_client_on_socket_ready(GSocket *socket, GIOCondition condition, GMpdClient 
 	UNLOCK(self);
 
 	return G_SOURCE_CONTINUE;
-}
-
-static TaskData *
-task_data_new(const gchar *command, GMpdResponse *response)
-{
-	TaskData *data;
-
-	g_return_val_if_fail(command != NULL, NULL);
-	g_return_val_if_fail(response == NULL || GMPD_IS_RESPONSE(response), NULL);
-
-	data = g_slice_new(TaskData);
-	data->command = g_strdup(command);
-	data->response = response;
-
-	return data;
-}
-
-static void
-task_data_free(TaskData *data)
-{
-	g_clear_pointer(&data->command, g_free);
-	g_clear_object(&data->response);
-	g_slice_free(TaskData, data);
 }
 
