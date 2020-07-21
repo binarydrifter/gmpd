@@ -20,6 +20,8 @@
 #include <gio/gunixsocketaddress.h>
 
 #include "gmpd-client.h"
+#include "gmpd-idle.h"
+#include "gmpd-idle-response.h"
 #include "gmpd-object.h"
 #include "gmpd-protocol.h"
 #include "gmpd-response.h"
@@ -79,6 +81,10 @@ static GTask *gmpd_client_start_task(GMpdClient *self,
                                      gpointer user_data);
 
 static void gmpd_client_do_disconnect(GMpdClient *self);
+static void gmpd_client_update_timeout(GMpdClient *self);
+static gboolean gmpd_client_is_idle(GMpdClient *self);
+static void gmpd_client_disable_timeout(GMpdClient *self);
+static void gmpd_client_enable_timeout(GMpdClient *self);
 static gboolean gmpd_client_do_flush(GMpdClient *self, GCancellable *cancellable, GError **error);
 static gboolean gmpd_client_do_fill(GMpdClient *self, GCancellable *cancellable, GError **error);
 static gboolean gmpd_client_do_sync(GMpdClient *self,
@@ -654,6 +660,98 @@ gmpd_client_currentsong_finish(GMpdClient *self, GAsyncResult *result, GError **
 	return retval ? GMPD_SONG(retval) : NULL;
 }
 
+GMpdIdle
+gmpd_client_idle(GMpdClient *self,
+                 GMpdIdle subsystems,
+                 GCancellable *cancellable,
+                 GError **error)
+{
+	GTask *task;
+	gboolean result;
+	GMpdIdleResponse *idle_resp;
+	GMpdIdle idle;
+
+	g_return_val_if_fail(GMPD_IS_CLIENT(self), GMPD_IDLE_NONE);
+	g_return_val_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable), GMPD_IDLE_NONE);
+	g_return_val_if_fail(error == NULL || *error == NULL, GMPD_IDLE_NONE);
+
+	LOCK(self);
+
+	task = gmpd_client_start_task(self,
+	                              TRUE,
+	                              gmpd_protocol_idle(subsystems),
+	                              cancellable,
+	                              NULL, NULL);
+
+	result = gmpd_client_do_sync(self, G_IO_IN | G_IO_OUT, TRUE, cancellable, error);
+	if (!result) {
+		g_object_unref(task);
+		UNLOCK(self);
+		return GMPD_IDLE_NONE;
+	}
+
+	idle_resp = g_task_propagate_pointer(task, error);
+	idle = gmpd_idle_response_get_changed(idle_resp);
+
+	g_object_unref(task);
+	g_object_unref(idle_resp);
+
+	UNLOCK(self);
+
+	return idle;
+}
+
+void
+gmpd_client_idle_async(GMpdClient *self,
+                       GMpdIdle subsystems,
+                       GCancellable *cancellable,
+                       GAsyncReadyCallback callback,
+                       gpointer user_data)
+{
+	GTask *task;
+
+	g_return_if_fail(GMPD_IS_CLIENT(self));
+	g_return_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable));
+	g_return_if_fail(callback != NULL || user_data == NULL);
+
+	task = gmpd_client_start_task(self,
+	                              FALSE,
+	                              gmpd_protocol_idle(subsystems),
+	                              cancellable,
+	                              callback,
+	                              user_data);
+
+	g_object_unref(task);
+}
+
+GMpdIdle
+gmpd_client_idle_finish(GMpdClient *self, GAsyncResult *result, GError **error)
+{
+	GTask *task;
+	gpointer idle_resp;
+	GMpdIdle retval;
+
+	g_return_val_if_fail(GMPD_IS_CLIENT(self), GMPD_IDLE_NONE);
+	g_return_val_if_fail(G_IS_TASK(result), GMPD_IDLE_NONE);
+	g_return_val_if_fail(error == NULL || *error == NULL, GMPD_IDLE_NONE);
+
+	task = G_TASK(result);
+	g_return_val_if_fail(g_task_get_source_object(task) == self, GMPD_IDLE_NONE);
+
+	idle_resp = g_task_propagate_pointer(task, error);
+	if (!idle_resp) {
+		g_object_unref(task);
+		return GMPD_IDLE_NONE;
+	}
+
+	retval = gmpd_idle_response_get_changed(GMPD_IDLE_RESPONSE(idle_resp));
+
+	g_object_unref(task);
+	g_object_unref(idle_resp);
+
+	return retval;
+}
+
 GMpdStatus *
 gmpd_client_status(GMpdClient *self, GCancellable *cancellable, GError **error)
 {
@@ -1088,6 +1186,7 @@ gmpd_client_start_task(GMpdClient *self,
                        gpointer user_data)
 {
 	GTask *task;
+	GMpdTaskData *tail_data;
 
 	g_return_val_if_fail(GMPD_IS_CLIENT(self), NULL);
 	g_return_val_if_fail(task_data != NULL, NULL);
@@ -1110,6 +1209,19 @@ gmpd_client_start_task(GMpdClient *self,
 		return task;
 	}
 
+	tail_data = g_queue_peek_tail(self->task_queue);
+	if (tail_data && GMPD_IS_IDLE_RESPONSE(tail_data->response)) {
+		static const gchar noidle_command[] = "noidle\n";
+		static const gsize noidle_len = G_N_ELEMENTS(noidle_command) - 1;
+
+		/* cancel the previous idle call */
+		g_output_stream_write(G_OUTPUT_STREAM(self->output_stream),
+		                      noidle_command,
+		                      noidle_len,
+		                      NULL,
+		                      NULL);
+	}
+
 	g_queue_push_tail(self->task_queue, g_object_ref(task));
 
 	g_output_stream_write(G_OUTPUT_STREAM(self->output_stream),
@@ -1120,6 +1232,8 @@ gmpd_client_start_task(GMpdClient *self,
 
 	gmpd_client_attach_output_source(self);
 	gmpd_client_attach_input_source(self);
+
+	gmpd_client_enable_timeout(self);
 
 	if (!have_lock)
 		UNLOCK(self);
@@ -1150,6 +1264,80 @@ gmpd_client_do_disconnect(GMpdClient *self)
 		g_task_return_error(task, err);
 		g_object_unref(task);
 	}
+}
+
+static void
+gmpd_client_update_timeout(GMpdClient *self)
+{
+	g_return_if_fail(GMPD_IS_CLIENT(self));
+
+	if (gmpd_client_is_idle(self))
+		gmpd_client_disable_timeout(self);
+	else
+		gmpd_client_enable_timeout(self);
+}
+
+static gboolean
+gmpd_client_is_idle(GMpdClient *self)
+{
+	GMpdTaskData *data;
+
+	g_return_val_if_fail(GMPD_IS_CLIENT(self), FALSE);
+
+	if (self->task_queue->length == 1) {
+		data = g_task_get_task_data(G_TASK(g_queue_peek_tail(self->task_queue)));
+
+		if (GMPD_IS_IDLE_RESPONSE(data->response))
+			return TRUE;
+	}
+
+	return FALSE;
+}
+
+static void
+gmpd_client_disable_timeout(GMpdClient *self)
+{
+	GSocket *socket;
+
+	g_return_if_fail(GMPD_IS_CLIENT(self));
+
+	if (!self->socket_connection)
+		return;
+
+	socket = g_socket_connection_get_socket(self->socket_connection);
+	g_socket_set_timeout(socket, 0);
+
+	if (self->input_source)
+		g_source_set_ready_time(self->input_source, -1);
+
+	if (self->output_source)
+		g_source_set_ready_time(self->output_source, -1);
+}
+
+static void
+gmpd_client_enable_timeout(GMpdClient *self)
+{
+	GSocket *socket;
+	gint64 ready_time;
+
+	g_return_if_fail(GMPD_IS_CLIENT(self));
+
+	if (!self->socket_connection)
+		return;
+
+	socket = g_socket_connection_get_socket(self->socket_connection);
+	g_socket_set_timeout(socket, self->timeout);
+
+	if (self->timeout)
+		ready_time = g_get_monotonic_time() + (self->timeout * 1000000);
+	else
+		ready_time = -1;
+
+	if (self->output_source)
+		g_source_set_ready_time(self->output_source, ready_time);
+
+	if (self->input_source)
+		g_source_set_ready_time(self->input_source, ready_time);
 }
 
 static gboolean
@@ -1184,6 +1372,8 @@ gmpd_client_do_flush(GMpdClient *self, GCancellable *cancellable, GError **error
 	}
 
 	gmpd_client_destroy_output_source(self);
+	gmpd_client_update_timeout(self);
+
 	return TRUE;
 }
 
@@ -1221,6 +1411,9 @@ gmpd_client_do_fill(GMpdClient *self, GCancellable *cancellable, GError **error)
 		if (!result) {
 			if (IS_WOULD_BLOCK(err) || IS_CANCELLED(err)) {
 				g_propagate_error(error, err);
+
+				gmpd_client_update_timeout(self);
+
 				return FALSE;
 			}
 

@@ -17,6 +17,8 @@
  */
 
 #include <gio/gio.h>
+#include "gmpd-idle.h"
+#include "gmpd-idle-response.h"
 #include "gmpd-protocol.h"
 #include "gmpd-response.h"
 #include "gmpd-song.h"
@@ -63,6 +65,25 @@ GMpdTaskData *
 gmpd_protocol_currentsong(void)
 {
 	return gmpd_task_data_new(g_strdup("currentsong\n"), GMPD_RESPONSE(gmpd_song_new()));
+}
+
+GMpdTaskData *
+gmpd_protocol_idle(GMpdIdle subsystems)
+{
+	gchar *command;
+
+	if (subsystems == GMPD_IDLE_NONE || subsystems == GMPD_IDLE_ALL) {
+		command = g_strdup("idle\n");
+
+	} else {
+		gchar *arg = gmpd_idle_to_string(subsystems);
+
+		command = g_strdup_printf("idle %s\n", arg);
+
+		g_free(arg);
+	}
+
+	return gmpd_task_data_new(command, GMPD_RESPONSE(gmpd_idle_response_new()));
 }
 
 GMpdTaskData *
