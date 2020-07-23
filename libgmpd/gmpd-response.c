@@ -19,7 +19,6 @@
 #include <gio/gio.h>
 #include "gmpd-error.h"
 #include "gmpd-response.h"
-#include "gmpd-response-priv.h"
 #include "gmpd-version.h"
 
 G_DEFINE_INTERFACE(GMpdResponse, gmpd_response, G_TYPE_OBJECT)

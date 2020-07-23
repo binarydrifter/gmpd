@@ -20,7 +20,6 @@
 #include "gmpd-idle.h"
 #include "gmpd-idle-response.h"
 #include "gmpd-response.h"
-#include "gmpd-response-priv.h"
 
 static void gmpd_idle_response_iface_init(GMpdResponseIface *iface);
 

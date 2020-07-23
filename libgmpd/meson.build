@@ -24,7 +24,6 @@ libgmpd_sources = [
   'gmpd-playback-state.c',
   'gmpd-protocol.c',
   'gmpd-protocol.h',
-  'gmpd-response-priv.h',
   'gmpd-response.c',
   'gmpd-response.h',
   'gmpd-song.c',

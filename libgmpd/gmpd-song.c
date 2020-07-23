@@ -22,7 +22,6 @@
 #include "gmpd-entity.h"
 #include "gmpd-entity-priv.h"
 #include "gmpd-response.h"
-#include "gmpd-response-priv.h"
 #include "gmpd-song.h"
 #include "gmpd-tag.h"
 #include "gmpd-version.h"

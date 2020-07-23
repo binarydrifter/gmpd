@@ -20,7 +20,6 @@
 #include "gmpd-audio-format.h"
 #include "gmpd-option-state.h"
 #include "gmpd-playback-state.h"
-#include "gmpd-response-priv.h"
 #include "gmpd-response.h"
 #include "gmpd-status.h"
 #include "gmpd-version.h"
