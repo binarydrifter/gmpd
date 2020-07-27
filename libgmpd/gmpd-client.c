@@ -1177,6 +1177,32 @@ gmpd_client_destroy_output_source(GMpdClient *self)
 	}
 }
 
+static void
+gmpd_client_noidle(GMpdClient *self)
+{
+	GTask *tail_task;
+	GMpdTaskData *tail_data;
+
+	g_return_if_fail(GMPD_IS_CLIENT(self));
+
+	if (!self->socket_connection)
+		return;
+
+	tail_task = g_queue_peek_tail(self->task_queue);
+	tail_data = tail_task ? g_task_get_task_data(tail_task) : NULL;
+
+	if (tail_data && GMPD_IS_IDLE_RESPONSE(tail_data->response)) {
+		static const gchar noidle_command[] = "noidle\n";
+		static const gsize noidle_len = G_N_ELEMENTS(noidle_command) - 1;
+
+		g_output_stream_write(G_OUTPUT_STREAM(self->output_stream),
+		                      noidle_command,
+		                      noidle_len,
+		                      NULL,
+		                      NULL);
+	}
+}
+
 static GTask *
 gmpd_client_start_task(GMpdClient *self,
                        gboolean have_lock,
@@ -1186,7 +1212,6 @@ gmpd_client_start_task(GMpdClient *self,
                        gpointer user_data)
 {
 	GTask *task;
-	GMpdTaskData *tail_data;
 
 	g_return_val_if_fail(GMPD_IS_CLIENT(self), NULL);
 	g_return_val_if_fail(task_data != NULL, NULL);
@@ -1209,18 +1234,7 @@ gmpd_client_start_task(GMpdClient *self,
 		return task;
 	}
 
-	tail_data = g_queue_peek_tail(self->task_queue);
-	if (tail_data && GMPD_IS_IDLE_RESPONSE(tail_data->response)) {
-		static const gchar noidle_command[] = "noidle\n";
-		static const gsize noidle_len = G_N_ELEMENTS(noidle_command) - 1;
-
-		/* cancel the previous idle call */
-		g_output_stream_write(G_OUTPUT_STREAM(self->output_stream),
-		                      noidle_command,
-		                      noidle_len,
-		                      NULL,
-		                      NULL);
-	}
+	gmpd_client_noidle(self);
 
 	g_queue_push_tail(self->task_queue, g_object_ref(task));
 
