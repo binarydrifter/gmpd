@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 #include <gmpd-client.h>
 #include <gmpd-entity.h>
 #include <gmpd-error.h>
+#include <gmpd-idle.h>
 #include <gmpd-option-state.h>
 #include <gmpd-playback-state.h>
 #include <gmpd-song.h>
