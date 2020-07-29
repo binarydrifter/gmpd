@@ -22,6 +22,7 @@
 #include "gmpd-protocol.h"
 #include "gmpd-response.h"
 #include "gmpd-song.h"
+#include "gmpd-stats.h"
 #include "gmpd-status.h"
 
 static GMpdTaskData *
@@ -90,6 +91,12 @@ GMpdTaskData *
 gmpd_protocol_status(void)
 {
 	return gmpd_task_data_new(g_strdup("status\n"), GMPD_RESPONSE(gmpd_status_new()));
+}
+
+GMpdTaskData *
+gmpd_protocol_stats(void)
+{
+	return gmpd_task_data_new(g_strdup("stats\n"), GMPD_RESPONSE(gmpd_stats_new()));
 }
 
 GMpdTaskData *

@@ -26,6 +26,7 @@
 #include <gio/gio.h>
 #include <gmpd-idle.h>
 #include <gmpd-song.h>
+#include <gmpd-stats.h>
 #include <gmpd-status.h>
 #include <gmpd-version.h>
 
@@ -116,6 +117,15 @@ void gmpd_client_status_async(GMpdClient *self,
                               gpointer user_data);
 
 GMpdStatus *gmpd_client_status_finish(GMpdClient *self, GAsyncResult *result, GError **error);
+
+GMpdStats *gmpd_client_stats(GMpdClient *self, GCancellable *cancellable, GError **error);
+
+void gmpd_client_stats_async(GMpdClient *self,
+                             GCancellable *cancellable,
+                             GAsyncReadyCallback callback,
+                             gpointer user_data);
+
+GMpdStats *gmpd_client_stats_finish(GMpdClient *self, GAsyncResult *result, GError **error);
 
 G_END_DECLS
 

@@ -42,6 +42,7 @@ void gmpd_task_data_unref(GMpdTaskData *self);
 GMpdTaskData *gmpd_protocol_currentsong(void);
 GMpdTaskData *gmpd_protocol_idle(GMpdIdle subsystems);
 GMpdTaskData *gmpd_protocol_status(void);
+GMpdTaskData *gmpd_protocol_stats(void);
 GMpdTaskData *gmpd_protocol_close(void);
 
 G_END_DECLS

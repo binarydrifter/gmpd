@@ -26,6 +26,7 @@
 #include "gmpd-protocol.h"
 #include "gmpd-response.h"
 #include "gmpd-song.h"
+#include "gmpd-stats.h"
 #include "gmpd-status.h"
 #include "gmpd-version.h"
 
@@ -780,6 +781,61 @@ gmpd_client_status_finish(GMpdClient *self, GAsyncResult *result, GError **error
 	g_return_val_if_fail(retval == NULL || GMPD_IS_STATUS(retval), NULL);
 
 	return retval ? GMPD_STATUS(retval) : NULL;
+}
+
+GMpdStats *
+gmpd_client_stats(GMpdClient *self, GCancellable *cancellable, GError **error)
+{
+	GMpdResponse *response;
+
+	g_return_val_if_fail(GMPD_IS_CLIENT(self), NULL);
+	g_return_val_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable), NULL);
+	g_return_val_if_fail(error == NULL || *error == NULL, NULL);
+
+	response = gmpd_client_run_task(self,
+	                                FALSE,
+	                                gmpd_protocol_stats(),
+	                                cancellable,
+	                                error);
+
+	return response ? GMPD_STATS(response) : NULL;
+}
+
+void
+gmpd_client_stats_async(GMpdClient *self,
+                        GCancellable *cancellable,
+                        GAsyncReadyCallback callback,
+                        gpointer user_data)
+{
+	g_return_if_fail(GMPD_IS_CLIENT(self));
+	g_return_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable));
+	g_return_if_fail(callback != NULL || user_data == NULL);
+
+	gmpd_client_run_task_async(self,
+	                           FALSE,
+	                           gmpd_protocol_stats(),
+	                           cancellable,
+	                           callback,
+	                           user_data);
+}
+
+GMpdStats *
+gmpd_client_stats_finish(GMpdClient *self, GAsyncResult *result, GError **error)
+{
+	GTask *task;
+	gpointer retval;
+
+	g_return_val_if_fail(GMPD_IS_CLIENT(self), NULL);
+	g_return_val_if_fail(G_IS_TASK(result), NULL);
+	g_return_val_if_fail(error == NULL || *error == NULL, NULL);
+
+	task = G_TASK(result);
+	g_return_val_if_fail(g_task_get_source_object(task) == self, NULL);
+
+	retval = g_task_propagate_pointer(task, error);
+	g_return_val_if_fail(retval == NULL || GMPD_IS_STATS(retval), NULL);
+
+	return retval ? GMPD_STATS(retval) : NULL;
 }
 
 static void

@@ -32,6 +32,7 @@ G_BEGIN_DECLS
 #include <gmpd-option-state.h>
 #include <gmpd-playback-state.h>
 #include <gmpd-song.h>
+#include <gmpd-stats.h>
 #include <gmpd-status.h>
 #include <gmpd-tag.h>
 #include <gmpd-version.h>
