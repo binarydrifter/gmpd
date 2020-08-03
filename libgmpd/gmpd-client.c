@@ -20,6 +20,7 @@
 #include <gio/gunixsocketaddress.h>
 
 #include "gmpd-client.h"
+#include "gmpd-error.h"
 #include "gmpd-idle.h"
 #include "gmpd-idle-response.h"
 #include "gmpd-object.h"
@@ -1494,22 +1495,23 @@ gmpd_client_do_fill(GMpdClient *self, GCancellable *cancellable, GError **error)
 		if (!result) {
 			if (IS_WOULD_BLOCK(err) || IS_CANCELLED(err)) {
 				g_propagate_error(error, err);
-
 				gmpd_client_update_timeout(self);
-
 				return FALSE;
 			}
 
-			if (error)
-				*error = g_error_copy(err);
-
 			g_queue_pop_head(self->task_queue);
-			g_task_return_error(task, err);
+			g_task_return_error(task, g_error_copy(err));
 			g_object_unref(task);
 
-			gmpd_client_do_disconnect(self);
+			if (err->domain != GMPD_ERROR) {
+				g_propagate_error(error, err);
+				gmpd_client_do_disconnect(self);
+				return FALSE;
+			}
 
-			return FALSE;
+			g_error_free(err);
+
+			continue;
 		}
 
 		g_queue_pop_head(self->task_queue);
