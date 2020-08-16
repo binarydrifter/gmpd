@@ -635,25 +635,6 @@ gmpd_client_currentsong_async(GMpdClient *self,
 	                           user_data);
 }
 
-GMpdSong *
-gmpd_client_currentsong_finish(GMpdClient *self, GAsyncResult *result, GError **error)
-{
-	GTask *task;
-	gpointer retval;
-
-	g_return_val_if_fail(GMPD_IS_CLIENT(self), NULL);
-	g_return_val_if_fail(G_IS_TASK(result), NULL);
-	g_return_val_if_fail(error == NULL || *error == NULL, NULL);
-
-	task = G_TASK(result);
-	g_return_val_if_fail(g_task_get_source_object(task) == self, NULL);
-
-	retval = g_task_propagate_pointer(task, error);
-	g_return_val_if_fail(retval == NULL || GMPD_IS_SONG(retval), NULL);
-
-	return retval ? GMPD_SONG(retval) : NULL;
-}
-
 GMpdIdle
 gmpd_client_idle(GMpdClient *self,
                  GMpdIdle subsystems,
@@ -702,33 +683,6 @@ gmpd_client_idle_async(GMpdClient *self,
 	                           user_data);
 }
 
-GMpdIdle
-gmpd_client_idle_finish(GMpdClient *self, GAsyncResult *result, GError **error)
-{
-	GTask *task;
-	gpointer idle_resp;
-	GMpdIdle retval;
-
-	g_return_val_if_fail(GMPD_IS_CLIENT(self), GMPD_IDLE_NONE);
-	g_return_val_if_fail(G_IS_TASK(result), GMPD_IDLE_NONE);
-	g_return_val_if_fail(error == NULL || *error == NULL, GMPD_IDLE_NONE);
-
-	task = G_TASK(result);
-	g_return_val_if_fail(g_task_get_source_object(task) == self, GMPD_IDLE_NONE);
-
-	idle_resp = g_task_propagate_pointer(task, error);
-	g_return_val_if_fail(idle_resp == NULL || GMPD_IS_IDLE_RESPONSE(idle_resp), GMPD_IDLE_NONE);
-
-	if (!idle_resp)
-		return GMPD_IDLE_NONE;
-
-	retval = gmpd_idle_response_get_changed(GMPD_IDLE_RESPONSE(idle_resp));
-
-	g_object_unref(idle_resp);
-
-	return retval;
-}
-
 GMpdStatus *
 gmpd_client_status(GMpdClient *self, GCancellable *cancellable, GError **error)
 {
@@ -763,25 +717,6 @@ gmpd_client_status_async(GMpdClient *self,
 	                           cancellable,
 	                           callback,
 	                           user_data);
-}
-
-GMpdStatus *
-gmpd_client_status_finish(GMpdClient *self, GAsyncResult *result, GError **error)
-{
-	GTask *task;
-	gpointer retval;
-
-	g_return_val_if_fail(GMPD_IS_CLIENT(self), NULL);
-	g_return_val_if_fail(G_IS_TASK(result), NULL);
-	g_return_val_if_fail(error == NULL || *error == NULL, NULL);
-
-	task = G_TASK(result);
-	g_return_val_if_fail(g_task_get_source_object(task) == self, NULL);
-
-	retval = g_task_propagate_pointer(task, error);
-	g_return_val_if_fail(retval == NULL || GMPD_IS_STATUS(retval), NULL);
-
-	return retval ? GMPD_STATUS(retval) : NULL;
 }
 
 GMpdStats *
@@ -820,8 +755,73 @@ gmpd_client_stats_async(GMpdClient *self,
 	                           user_data);
 }
 
+GMpdSong *
+gmpd_client_finish_song_response(GMpdClient *self, GAsyncResult *result, GError **error)
+{
+	GTask *task;
+	gpointer retval;
+
+	g_return_val_if_fail(GMPD_IS_CLIENT(self), NULL);
+	g_return_val_if_fail(G_IS_TASK(result), NULL);
+	g_return_val_if_fail(error == NULL || *error == NULL, NULL);
+
+	task = G_TASK(result);
+	g_return_val_if_fail(g_task_get_source_object(task) == self, NULL);
+
+	retval = g_task_propagate_pointer(task, error);
+	g_return_val_if_fail(retval == NULL || GMPD_IS_SONG(retval), NULL);
+
+	return retval ? GMPD_SONG(retval) : NULL;
+}
+
+GMpdIdle
+gmpd_client_finish_idle_response(GMpdClient *self, GAsyncResult *result, GError **error)
+{
+	GTask *task;
+	gpointer idle_resp;
+	GMpdIdle retval;
+
+	g_return_val_if_fail(GMPD_IS_CLIENT(self), GMPD_IDLE_NONE);
+	g_return_val_if_fail(G_IS_TASK(result), GMPD_IDLE_NONE);
+	g_return_val_if_fail(error == NULL || *error == NULL, GMPD_IDLE_NONE);
+
+	task = G_TASK(result);
+	g_return_val_if_fail(g_task_get_source_object(task) == self, GMPD_IDLE_NONE);
+
+	idle_resp = g_task_propagate_pointer(task, error);
+	g_return_val_if_fail(idle_resp == NULL || GMPD_IS_IDLE_RESPONSE(idle_resp), GMPD_IDLE_NONE);
+
+	if (!idle_resp)
+		return GMPD_IDLE_NONE;
+
+	retval = gmpd_idle_response_get_changed(GMPD_IDLE_RESPONSE(idle_resp));
+
+	g_object_unref(idle_resp);
+
+	return retval;
+}
+
+GMpdStatus *
+gmpd_client_finish_status_response(GMpdClient *self, GAsyncResult *result, GError **error)
+{
+	GTask *task;
+	gpointer retval;
+
+	g_return_val_if_fail(GMPD_IS_CLIENT(self), NULL);
+	g_return_val_if_fail(G_IS_TASK(result), NULL);
+	g_return_val_if_fail(error == NULL || *error == NULL, NULL);
+
+	task = G_TASK(result);
+	g_return_val_if_fail(g_task_get_source_object(task) == self, NULL);
+
+	retval = g_task_propagate_pointer(task, error);
+	g_return_val_if_fail(retval == NULL || GMPD_IS_STATUS(retval), NULL);
+
+	return retval ? GMPD_STATUS(retval) : NULL;
+}
+
 GMpdStats *
-gmpd_client_stats_finish(GMpdClient *self, GAsyncResult *result, GError **error)
+gmpd_client_finish_stats_response(GMpdClient *self, GAsyncResult *result, GError **error)
 {
 	GTask *task;
 	gpointer retval;

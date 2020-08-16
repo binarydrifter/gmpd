@@ -78,6 +78,7 @@ gboolean gmpd_client_get_keepalive(GMpdClient *self);
 guint gmpd_client_get_timeout(GMpdClient *self);
 GMpdVersion *gmpd_client_get_version(GMpdClient *self);
 
+
 gboolean gmpd_client_close(GMpdClient *self, GCancellable *cancellable, GError **error);
 
 void gmpd_client_close_async(GMpdClient *self,
@@ -87,6 +88,7 @@ void gmpd_client_close_async(GMpdClient *self,
 
 gboolean gmpd_client_close_finish(GMpdClient *self, GAsyncResult *callback, GError **error);
 
+
 GMpdSong *gmpd_client_currentsong(GMpdClient *self, GCancellable *cancellable, GError **error);
 
 void gmpd_client_currentsong_async(GMpdClient *self,
@@ -94,7 +96,6 @@ void gmpd_client_currentsong_async(GMpdClient *self,
                                    GAsyncReadyCallback callback,
                                    gpointer user_data);
 
-GMpdSong *gmpd_client_currentsong_finish(GMpdClient *self, GAsyncResult *result, GError **error);
 
 GMpdIdle gmpd_client_idle(GMpdClient *self,
                           GMpdIdle subsystems,
@@ -107,7 +108,6 @@ void gmpd_client_idle_async(GMpdClient *self,
                             GAsyncReadyCallback callback,
                             gpointer user_data);
 
-GMpdIdle gmpd_client_idle_finish(GMpdClient *self, GAsyncResult *result, GError **error);
 
 GMpdStatus *gmpd_client_status(GMpdClient *self, GCancellable *cancellable, GError **error);
 
@@ -116,7 +116,6 @@ void gmpd_client_status_async(GMpdClient *self,
                               GAsyncReadyCallback callback,
                               gpointer user_data);
 
-GMpdStatus *gmpd_client_status_finish(GMpdClient *self, GAsyncResult *result, GError **error);
 
 GMpdStats *gmpd_client_stats(GMpdClient *self, GCancellable *cancellable, GError **error);
 
@@ -125,7 +124,11 @@ void gmpd_client_stats_async(GMpdClient *self,
                              GAsyncReadyCallback callback,
                              gpointer user_data);
 
-GMpdStats *gmpd_client_stats_finish(GMpdClient *self, GAsyncResult *result, GError **error);
+
+GMpdSong *gmpd_client_finish_song_response(GMpdClient *self, GAsyncResult *result, GError **error);
+GMpdIdle gmpd_client_finish_idle_response(GMpdClient *self, GAsyncResult *result, GError **error);
+GMpdStatus *gmpd_client_finish_status_response(GMpdClient *self, GAsyncResult *result, GError **error);
+GMpdStats *gmpd_client_finish_stats_response(GMpdClient *self, GAsyncResult *result, GError **error);
 
 G_END_DECLS
 
