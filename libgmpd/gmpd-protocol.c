@@ -24,6 +24,7 @@
 #include "gmpd-song.h"
 #include "gmpd-stats.h"
 #include "gmpd-status.h"
+#include "gmpd-void-response.h"
 
 static GMpdTaskData *
 gmpd_task_data_new(gchar *command, GMpdResponse *response)
@@ -60,6 +61,12 @@ gmpd_task_data_unref(GMpdTaskData *self)
 
 		g_slice_free(GMpdTaskData, self);
 	}
+}
+
+GMpdTaskData *
+gmpd_protocol_clearerror(void)
+{
+	return gmpd_task_data_new(g_strdup("clearerror\n"), GMPD_RESPONSE(gmpd_void_response_new()));
 }
 
 GMpdTaskData *

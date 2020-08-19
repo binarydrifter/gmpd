@@ -30,6 +30,7 @@
 #include "gmpd-stats.h"
 #include "gmpd-status.h"
 #include "gmpd-version.h"
+#include "gmpd-void-response.h"
 
 #define LOCK(client) G_STMT_START { \
 	gmpd_object_lock(GMPD_OBJECT((client))); \
@@ -599,6 +600,54 @@ gmpd_client_close_finish(GMpdClient *self, GAsyncResult *result, GError **error)
 	return retval;
 }
 
+gboolean
+gmpd_client_clearerror(GMpdClient *self, GCancellable *cancellable, GError **error)
+{
+	GMpdResponse *response;
+	GError *err;
+	gboolean retval;
+
+	g_return_val_if_fail(GMPD_IS_CLIENT(self), FALSE);
+	g_return_val_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable), FALSE);
+	g_return_val_if_fail(error == NULL || *error == NULL, FALSE);
+
+	response = gmpd_client_run_task(self,
+	                                FALSE,
+	                                gmpd_protocol_clearerror(),
+	                                cancellable,
+	                                &err);
+
+	g_clear_object(&response);
+
+	if (err) {
+		retval = FALSE;
+		g_propagate_error(error, err);
+	} else {
+		retval = TRUE;
+	}
+
+	return retval;
+}
+
+void
+gmpd_client_clearerror_async(GMpdClient *self,
+                             GCancellable *cancellable,
+                             GAsyncReadyCallback callback,
+                             gpointer user_data)
+{
+	g_return_if_fail(GMPD_IS_CLIENT(self));
+	g_return_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable));
+	g_return_if_fail(callback != NULL || user_data == NULL);
+
+	gmpd_client_run_task_async(self,
+	                           FALSE,
+	                           gmpd_protocol_clearerror(),
+	                           cancellable,
+	                           callback,
+	                           user_data);
+
+}
+
 GMpdSong *
 gmpd_client_currentsong(GMpdClient *self, GCancellable *cancellable, GError **error)
 {
@@ -837,6 +886,36 @@ gmpd_client_finish_stats_response(GMpdClient *self, GAsyncResult *result, GError
 	g_return_val_if_fail(retval == NULL || GMPD_IS_STATS(retval), NULL);
 
 	return retval ? GMPD_STATS(retval) : NULL;
+}
+
+gboolean
+gmpd_client_finish_void_response(GMpdClient *self, GAsyncResult *result, GError **error)
+{
+	GTask *task;
+	GMpdVoidResponse *response;
+	GError *err = NULL;
+	gboolean retval;
+
+	g_return_val_if_fail(GMPD_IS_CLIENT(self), FALSE);
+	g_return_val_if_fail(G_IS_TASK(result), FALSE);
+	g_return_val_if_fail(error == NULL || *error == NULL, FALSE);
+
+	task = G_TASK(self);
+	g_return_val_if_fail(g_task_get_source_object(task) == self, FALSE);
+
+	response = g_task_propagate_pointer(task, &err);
+	g_return_val_if_fail(response == NULL || GMPD_IS_VOID_RESPONSE(response), FALSE);
+
+	g_clear_object(&response);
+
+	if (err) {
+		retval = FALSE;
+		g_propagate_error(error, err);
+	} else {
+		retval = TRUE;
+	}
+
+	return retval;
 }
 
 static void

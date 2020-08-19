@@ -88,6 +88,12 @@ void gmpd_client_close_async(GMpdClient *self,
 
 gboolean gmpd_client_close_finish(GMpdClient *self, GAsyncResult *callback, GError **error);
 
+gboolean gmpd_client_clearerror(GMpdClient *self, GCancellable *cancellable, GError **error);
+
+void gmpd_client_clearerror_async(GMpdClient *self,
+                                  GCancellable *cancellable,
+                                  GAsyncReadyCallback callback,
+                                  gpointer user_data);
 
 GMpdSong *gmpd_client_currentsong(GMpdClient *self, GCancellable *cancellable, GError **error);
 
@@ -129,6 +135,7 @@ GMpdSong *gmpd_client_finish_song_response(GMpdClient *self, GAsyncResult *resul
 GMpdIdle gmpd_client_finish_idle_response(GMpdClient *self, GAsyncResult *result, GError **error);
 GMpdStatus *gmpd_client_finish_status_response(GMpdClient *self, GAsyncResult *result, GError **error);
 GMpdStats *gmpd_client_finish_stats_response(GMpdClient *self, GAsyncResult *result, GError **error);
+gboolean gmpd_client_finish_void_response(GMpdClient *self, GAsyncResult *result, GError **error);
 
 G_END_DECLS
 

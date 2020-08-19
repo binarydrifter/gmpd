@@ -39,6 +39,7 @@ typedef struct _GMpdTaskData {
 GMpdTaskData *gmpd_task_data_ref(GMpdTaskData *self);
 void gmpd_task_data_unref(GMpdTaskData *self);
 
+GMpdTaskData *gmpd_protocol_clearerror(void);
 GMpdTaskData *gmpd_protocol_currentsong(void);
 GMpdTaskData *gmpd_protocol_idle(GMpdIdle subsystems);
 GMpdTaskData *gmpd_protocol_status(void);

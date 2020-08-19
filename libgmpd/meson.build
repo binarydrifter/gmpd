@@ -31,6 +31,8 @@ libgmpd_sources = [
   'gmpd-status.c',
   'gmpd-tag.c',
   'gmpd-version.c',
+  'gmpd-void-response.c',
+  'gmpd-void-response.h',
 ]
 
 libgmpd_headers = [
