@@ -40,32 +40,32 @@ G_BEGIN_DECLS
 #define GMPD_RESPONSE_GET_IFACE(inst) \
 	(G_TYPE_INSTANCE_GET_INTERFACE((inst), GMPD_TYPE_RESPONSE, GMpdResponseIface))
 
-typedef struct _GMpdResponse GMpdResponse;
+typedef struct _GMpdResponse      GMpdResponse;
 typedef struct _GMpdResponseIface GMpdResponseIface;
-typedef GMpdResponseIface GMpdResponseInterface;
+typedef GMpdResponseIface         GMpdResponseInterface;
 
 struct _GMpdResponseIface {
 	GTypeInterface __base__;
 
-	void (*feed_pair) (GMpdResponse *self,
-	                   GMpdVersion *version,
-	                   const gchar *key,
-	                   const gchar *value);
+	void           (*feed_pair)             (GMpdResponse *self,
+	                                         GMpdVersion  *version,
+	                                         const gchar  *key,
+	                                         const gchar  *value);
 
-	void (*feed_binary) (GMpdResponse *self,
-	                     GMpdVersion *version,
-	                     GBytes *binary);
+	void           (*feed_binary)           (GMpdResponse *self,
+	                                         GMpdVersion  *version,
+	                                         GBytes       *binary);
 
-	gsize (*get_remaining_binary) (GMpdResponse *self);
+	gsize          (*get_remaining_binary)  (GMpdResponse *self);
 };
 
-GType gmpd_response_get_type(void);
+GType     gmpd_response_get_type     (void);
 
-gboolean gmpd_response_deserialize(GMpdResponse *self,
-                                   GMpdVersion *version,
-                                   GDataInputStream *input_stream,
-                                   GCancellable *cancellable,
-                                   GError **error);
+gboolean  gmpd_response_deserialize  (GMpdResponse     *self,
+                                      GMpdVersion      *version,
+                                      GDataInputStream *input_stream,
+                                      GCancellable     *cancellable,
+                                      GError          **error);
 
 G_END_DECLS
 

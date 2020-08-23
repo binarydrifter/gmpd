@@ -45,28 +45,41 @@ G_BEGIN_DECLS
 #define GMPD_STATS_GET_CLASS(inst) \
 	(G_TYPE_INSTANCE_GET_CLASS((inst), GMPD_TYPE_STATS, GMpdStatsClass))
 
-typedef struct _GMpdStats GMpdStats;
+typedef struct _GMpdStats      GMpdStats;
 typedef struct _GMpdStatsClass GMpdStatsClass;
 
-GType gmpd_stats_get_type(void);
+GType        gmpd_stats_get_type         (void);
 
-GMpdStats *gmpd_stats_new(void);
+GMpdStats *  gmpd_stats_new              (void);
 
-void gmpd_stats_set_artists(GMpdStats *self, guint artists);
-void gmpd_stats_set_albums(GMpdStats *self, guint albums);
-void gmpd_stats_set_songs(GMpdStats *self, guint songs);
-void gmpd_stats_set_uptime(GMpdStats *self, guint64 uptime);
-void gmpd_stats_set_db_playtime(GMpdStats *self, guint64 db_playtime);
-void gmpd_stats_set_db_update(GMpdStats *self, GDateTime *db_update);
-void gmpd_stats_set_playtime(GMpdStats *self, guint64 playtime);
+void         gmpd_stats_set_artists      (GMpdStats *self,
+                                          guint      artists);
 
-guint gmpd_stats_get_artists(GMpdStats *self);
-guint gmpd_stats_get_albums(GMpdStats *self);
-guint gmpd_stats_get_songs(GMpdStats *self);
-guint64 gmpd_stats_get_uptime(GMpdStats *self);
-guint64 gmpd_stats_get_db_playtime(GMpdStats *self);
-GDateTime *gmpd_stats_get_db_update(GMpdStats *self);
-guint64 gmpd_stats_get_playtime(GMpdStats *self);
+void         gmpd_stats_set_albums       (GMpdStats *self,
+                                          guint      albums);
+
+void         gmpd_stats_set_songs        (GMpdStats *self,
+                                          guint      songs);
+
+void         gmpd_stats_set_uptime       (GMpdStats *self,
+                                          guint64    uptime);
+
+void         gmpd_stats_set_db_playtime  (GMpdStats *self,
+                                          guint64    db_playtime);
+
+void         gmpd_stats_set_db_update    (GMpdStats *self,
+                                          GDateTime *db_update);
+
+void         gmpd_stats_set_playtime     (GMpdStats *self,
+                                          guint64    playtime);
+
+guint        gmpd_stats_get_artists      (GMpdStats *self);
+guint        gmpd_stats_get_albums       (GMpdStats *self);
+guint        gmpd_stats_get_songs        (GMpdStats *self);
+guint64      gmpd_stats_get_uptime       (GMpdStats *self);
+guint64      gmpd_stats_get_db_playtime  (GMpdStats *self);
+GDateTime *  gmpd_stats_get_db_update    (GMpdStats *self);
+guint64      gmpd_stats_get_playtime     (GMpdStats *self);
 
 G_END_DECLS
 

@@ -49,30 +49,48 @@ G_BEGIN_DECLS
 #define GMPD_SONG_GET_CLASS(inst) \
 	(G_TYPE_INSTANCE_GET_CLASS((inst), GMPD_TYPE_SONG, GMpdSongClass))
 
-typedef struct _GMpdSong GMpdSong;
+typedef struct _GMpdSong      GMpdSong;
 typedef struct _GMpdSongClass GMpdSongClass;
 
-GType gmpd_song_get_type(void);
+GType              gmpd_song_get_type         (void);
 
-GMpdSong *gmpd_song_new(void);
+GMpdSong *         gmpd_song_new              (void);
 
-void gmpd_song_set_position(GMpdSong *self, guint position);
-void gmpd_song_set_id(GMpdSong *self, guint id);
-void gmpd_song_set_priority(GMpdSong *self, guint8 priority);
-void gmpd_song_set_duration(GMpdSong *self, float duration);
-void gmpd_song_set_range_start(GMpdSong *self, float range_start);
-void gmpd_song_set_range_end(GMpdSong *self, float range_end);
-void gmpd_song_set_format(GMpdSong *self, GMpdAudioFormat *afmt);
-void gmpd_song_set_tag(GMpdSong *self, GMpdTag tag, const gchar *const *values);
+void               gmpd_song_set_position     (GMpdSong           *self,
+                                               guint               position);
 
-guint gmpd_song_get_position(GMpdSong *self);
-guint gmpd_song_get_id(GMpdSong *self);
-guint8 gmpd_song_get_priority(GMpdSong *self);
-float gmpd_song_get_duration(GMpdSong *self);
-float gmpd_song_get_range_start(GMpdSong *self);
-float gmpd_song_get_range_end(GMpdSong *self);
-GMpdAudioFormat *gmpd_song_get_format(GMpdSong *self);
-gchar **gmpd_song_get_tag(GMpdSong *self, GMpdTag tag);
+void               gmpd_song_set_id           (GMpdSong           *self,
+                                               guint               id);
+
+void               gmpd_song_set_priority     (GMpdSong           *self,
+                                               guint8              priority);
+
+void               gmpd_song_set_duration     (GMpdSong           *self,
+                                               float               duration);
+
+void               gmpd_song_set_range_start  (GMpdSong           *self,
+                                               float               range_start);
+
+void               gmpd_song_set_range_end    (GMpdSong           *self,
+                                               float               range_end);
+
+void               gmpd_song_set_format       (GMpdSong           *self,
+                                               GMpdAudioFormat    *afmt);
+
+void               gmpd_song_set_tag          (GMpdSong           *self,
+                                               GMpdTag             tag,
+                                               const gchar *const *values);
+
+guint              gmpd_song_get_position     (GMpdSong           *self);
+guint              gmpd_song_get_id           (GMpdSong           *self);
+guint8             gmpd_song_get_priority     (GMpdSong           *self);
+float              gmpd_song_get_duration     (GMpdSong           *self);
+float              gmpd_song_get_range_start  (GMpdSong           *self);
+float              gmpd_song_get_range_end    (GMpdSong           *self);
+GMpdAudioFormat *  gmpd_song_get_format       (GMpdSong           *self);
+
+gchar **           gmpd_song_get_tag          (GMpdSong           *self,
+                                               GMpdTag             tag);
 
 G_END_DECLS
 

@@ -39,7 +39,7 @@ G_BEGIN_DECLS
 	(gmpd_error_quark())
 
 typedef enum _GMpdErrorEnum {
-	GMPD_ERROR_UNKNOWN    = -1,
+	GMPD_ERROR_UNKNOWN = -1,
 
 	GMPD_ERROR_NOT_LIST   = 1,
 	GMPD_ERROR_ARGUMENTS  = 2,
@@ -56,11 +56,9 @@ typedef enum _GMpdErrorEnum {
 	GMPD_ERROR_EXISTS             = 56,
 } GMpdErrorEnum;
 
-GType gmpd_error_enum_get_type(void);
-
-GQuark gmpd_error_quark(void);
-
-GError *gmpd_error_from_string(const gchar *s);
+GType   gmpd_error_enum_get_type  (void);
+GQuark  gmpd_error_quark          (void);
+GError *gmpd_error_from_string    (const gchar *s);
 
 G_END_DECLS
 

@@ -40,10 +40,10 @@ typedef enum _GMpdOptionState {
 	GMPD_OPTION_ENABLED,
 } GMpdOptionState;
 
-GType gmpd_option_state_get_type(void);
+GType            gmpd_option_state_get_type     (void);
 
-GMpdOptionState gmpd_option_state_from_string(const gchar *s);
-gchar *gmpd_option_state_to_string(GMpdOptionState state);
+GMpdOptionState  gmpd_option_state_from_string  (const gchar    *s);
+gchar *          gmpd_option_state_to_string    (GMpdOptionState state);
 
 G_END_DECLS
 

@@ -45,7 +45,7 @@ G_BEGIN_DECLS
 #define GMPD_VOID_RESPONSE_GET_CLASS(inst) \
 	(G_TYPE_INSTANCE_GET_CLASS((inst), GMPD_TYPE_VOID_RESPONSE, GMpdVoidResponseClass))
 
-typedef struct _GMpdVoidResponse GMpdVoidResponse;
+typedef struct _GMpdVoidResponse      GMpdVoidResponse;
 typedef struct _GMpdVoidResponseClass GMpdVoidResponseClass;
 
 struct _GMpdVoidResponse {
@@ -56,9 +56,8 @@ struct _GMpdVoidResponseClass {
 	GObjectClass __base__;
 };
 
-GType gmpd_void_response_get_type(void);
-
-GMpdVoidResponse *gmpd_void_response_new(void);
+GType               gmpd_void_response_get_type  (void);
+GMpdVoidResponse *  gmpd_void_response_new       (void);
 
 G_END_DECLS
 

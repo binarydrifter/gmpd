@@ -45,16 +45,19 @@ G_BEGIN_DECLS
 #define GMPD_ENTITY_GET_CLASS(inst) \
 	(G_TYPE_INSTANCE_GET_CLASS((inst), GMPD_TYPE_ENTITY, GMpdEntityClass))
 
-typedef struct _GMpdEntity GMpdEntity;
+typedef struct _GMpdEntity      GMpdEntity;
 typedef struct _GMpdEntityClass GMpdEntityClass;
 
-GType gmpd_entity_get_type(void);
+GType        gmpd_entity_get_type           (void);
 
-void gmpd_entity_set_path(GMpdEntity *self, const gchar *path);
-void gmpd_entity_set_last_modified(GMpdEntity *self, GDateTime *last_modified);
+void         gmpd_entity_set_path           (GMpdEntity  *self,
+                                             const gchar *path);
 
-gchar *gmpd_entity_get_path(GMpdEntity *self);
-GDateTime *gmpd_entity_get_last_modified(GMpdEntity *self);
+void         gmpd_entity_set_last_modified  (GMpdEntity  *self,
+                                             GDateTime   *last_modified);
+
+gchar *      gmpd_entity_get_path           (GMpdEntity  *self);
+GDateTime *  gmpd_entity_get_last_modified  (GMpdEntity  *self);
 
 G_END_DECLS
 

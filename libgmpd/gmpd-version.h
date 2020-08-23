@@ -45,19 +45,23 @@ G_BEGIN_DECLS
 #define GMPD_VERSION_GET_CLASS(inst) \
 	(G_TYPE_INSTANCE_GET_CLASS((inst), GMPD_TYPE_VERSION, GMpdVersionClass))
 
-typedef struct _GMpdVersion GMpdVersion;
+typedef struct _GMpdVersion      GMpdVersion;
 typedef struct _GMpdVersionClass GMpdVersionClass;
 
-GType gmpd_version_get_type(void);
+GType          gmpd_version_get_type         (void);
 
-GMpdVersion *gmpd_version_new(gint major, gint minor, gint patch);
-GMpdVersion *gmpd_version_new_from_string(const gchar *s);
+GMpdVersion *  gmpd_version_new              (gint         major,
+                                              gint         minor,
+                                              gint         patch);
 
-gint gmpd_version_get_major(GMpdVersion *self);
-gint gmpd_version_get_minor(GMpdVersion *self);
-gint gmpd_version_get_patch(GMpdVersion *self);
+GMpdVersion *  gmpd_version_new_from_string  (const gchar *s);
 
-gint gmpd_version_compare(GMpdVersion *lhs, GMpdVersion *rhs);
+gint           gmpd_version_get_major        (GMpdVersion *self);
+gint           gmpd_version_get_minor        (GMpdVersion *self);
+gint           gmpd_version_get_patch        (GMpdVersion *self);
+
+gint           gmpd_version_compare          (GMpdVersion *lhs,
+                                              GMpdVersion *rhs);
 
 G_END_DECLS
 

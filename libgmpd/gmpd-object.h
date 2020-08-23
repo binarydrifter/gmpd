@@ -45,22 +45,22 @@ G_BEGIN_DECLS
 #define GMPD_OBJECT_GET_CLASS(inst) \
 	(G_TYPE_INSTANCE_GET_CLASS((inst), GMPD_TYPE_OBJECT, GMpdObjectClass))
 
-typedef struct _GMpdObject GMpdObject;
+typedef struct _GMpdObject      GMpdObject;
 typedef struct _GMpdObjectClass GMpdObjectClass;
 
 struct _GMpdObject {
 	GObject __base__;
-	GMutex mutex;
+	GMutex    mutex;
 };
 
 struct _GMpdObjectClass {
 	GObjectClass __base__;
 };
 
-GType gmpd_object_get_type(void);
+GType gmpd_object_get_type  (void);
 
-void gmpd_object_lock(GMpdObject *self);
-void gmpd_object_unlock(GMpdObject *self);
+void  gmpd_object_lock      (GMpdObject *self);
+void  gmpd_object_unlock    (GMpdObject *self);
 
 G_END_DECLS
 

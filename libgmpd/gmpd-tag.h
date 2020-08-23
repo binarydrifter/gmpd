@@ -64,12 +64,10 @@ typedef enum _GMpdTag {
 	GMPD_N_TAGS,
 } GMpdTag;
 
-GType gmpd_tag_get_type(void);
-
-GMpdTag gmpd_tag_from_string(const gchar *s);
-gchar *gmpd_tag_to_string(GMpdTag tag);
-
-GQuark gmpd_tag_to_quark(GMpdTag tag);
+GType    gmpd_tag_get_type     (void);
+GMpdTag  gmpd_tag_from_string  (const gchar *s);
+gchar *  gmpd_tag_to_string    (GMpdTag      tag);
+GQuark   gmpd_tag_to_quark     (GMpdTag      tag);
 
 G_END_DECLS
 

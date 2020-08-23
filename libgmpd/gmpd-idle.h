@@ -27,14 +27,9 @@
 
 G_BEGIN_DECLS
 
-#define GMPD_TYPE_IDLE \
-	(gmpd_idle_get_type())
-
-#define GMPD_IDLE_NONE \
-	((GMpdIdle)0)
-
-#define GMPD_IDLE_ALL \
-	((GMpdIdle)(0x3fff))
+#define GMPD_TYPE_IDLE  (gmpd_idle_get_type())
+#define GMPD_IDLE_NONE  ((GMpdIdle) 0)
+#define GMPD_IDLE_ALL   ((GMpdIdle) 0x3fff)
 
 typedef enum _GMpdIdle {
 	GMPD_IDLE_DATABASE     = 1 << 0,
@@ -53,10 +48,9 @@ typedef enum _GMpdIdle {
 	GMPD_IDLE_MOUNT        = 1 << 13,
 } GMpdIdle;
 
-GType gmpd_idle_get_type(void);
-
-GMpdIdle gmpd_idle_from_string(const gchar *s);
-gchar *gmpd_idle_to_string(GMpdIdle idle);
+GType     gmpd_idle_get_type     (void);
+GMpdIdle  gmpd_idle_from_string  (const gchar *s);
+gchar *   gmpd_idle_to_string    (GMpdIdle     idle);
 
 G_END_DECLS
 

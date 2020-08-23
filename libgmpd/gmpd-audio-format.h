@@ -47,25 +47,30 @@ G_BEGIN_DECLS
 
 typedef enum _GMpdSampleFormat {
 	GMPD_SAMPLE_FORMAT_UNDEFINED = 0x00,
-	GMPD_SAMPLE_FORMAT_FLOAT = 0xe0,
-	GMPD_SAMPLE_FORMAT_DSD = 0xe1,
+	GMPD_SAMPLE_FORMAT_FLOAT     = 0xe0,
+	GMPD_SAMPLE_FORMAT_DSD       = 0xe1,
 } GMpdSampleFormat;
 
-typedef struct _GMpdAudioFormat GMpdAudioFormat;
+typedef struct _GMpdAudioFormat      GMpdAudioFormat;
 typedef struct _GMpdAudioFormatClass GMpdAudioFormatClass;
 
-GType gmpd_audio_format_get_type(void);
+GType              gmpd_audio_format_get_type         (void);
 
-GMpdAudioFormat *gmpd_audio_format_new(void);
-GMpdAudioFormat *gmpd_audio_format_new_from_string(const gchar *s);
+GMpdAudioFormat *  gmpd_audio_format_new              (void);
+GMpdAudioFormat *  gmpd_audio_format_new_from_string  (const gchar     *s);
 
-void gmpd_audio_format_set_sample_rate(GMpdAudioFormat *self, guint32 sample_rate);
-void gmpd_audio_format_set_bit_depth(GMpdAudioFormat *self, guint8 bit_depth);
-void gmpd_audio_format_set_channels(GMpdAudioFormat *self, guint8 bit_depth);
+void               gmpd_audio_format_set_sample_rate  (GMpdAudioFormat *self,
+                                                       guint32          sample_rate);
 
-guint32 gmpd_audio_format_get_sample_rate(GMpdAudioFormat *self);
-guint8 gmpd_audio_format_get_bit_depth(GMpdAudioFormat *self);
-guint8 gmpd_audio_format_get_channels(GMpdAudioFormat *self);
+void               gmpd_audio_format_set_bit_depth    (GMpdAudioFormat *self,
+                                                       guint8           bit_depth);
+
+void               gmpd_audio_format_set_channels     (GMpdAudioFormat *self,
+                                                       guint8           bit_depth);
+
+guint32            gmpd_audio_format_get_sample_rate  (GMpdAudioFormat *self);
+guint8             gmpd_audio_format_get_bit_depth    (GMpdAudioFormat *self);
+guint8             gmpd_audio_format_get_channels     (GMpdAudioFormat *self);
 
 G_END_DECLS
 

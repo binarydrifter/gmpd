@@ -50,92 +50,129 @@ G_BEGIN_DECLS
 #define GMPD_CLIENT_GET_CLASS(inst) \
 	(G_TYPE_INSTANCE_GET_CLASS((inst), GMPD_TYPE_CLIENT, GMpdClientClass))
 
-typedef struct _GMpdClient GMpdClient;
+typedef struct _GMpdClient      GMpdClient;
 typedef struct _GMpdClientClass GMpdClientClass;
 
-GType gmpd_client_get_type(void);
+GType           gmpd_client_get_type                (void);
 
-GMpdClient *gmpd_client_connect(const gchar *hostname,
-                                guint16 port,
-                                GCancellable *cancellable,
-                                GError **error);
+GMpdClient *    gmpd_client_connect                 (const gchar         *hostname,
+                                                     guint16              port,
+                                                     GCancellable        *cancellable,
+                                                     GError             **error);
 
-void gmpd_client_connect_async(const gchar *hostname,
-                               guint16 port,
-                               GCancellable *cancellable,
-                               GAsyncReadyCallback callback,
-                               gpointer user_data);
+void            gmpd_client_connect_async           (const gchar         *hostname,
+                                                     guint16              port,
+                                                     GCancellable        *cancellable,
+                                                     GAsyncReadyCallback  callback,
+                                                     gpointer             user_data);
 
-GMpdClient *gmpd_client_connect_finish(GAsyncResult *result, GError **error);
+GMpdClient *    gmpd_client_connect_finish          (GAsyncResult        *result,
+                                                     GError             **error);
 
-void gmpd_client_set_keepalive(GMpdClient *self, gboolean keepalive);
-void gmpd_client_set_timeout(GMpdClient *self, guint timeout);
+gboolean        gmpd_client_close                   (GMpdClient          *self,
+                                                     GCancellable        *cancellable,
+                                                     GError             **error);
 
-GMainContext *gmpd_client_get_context(GMpdClient *self);
-gchar *gmpd_client_get_hostname(GMpdClient *self);
-guint16 gmpd_client_get_port(GMpdClient *self);
-gboolean gmpd_client_get_keepalive(GMpdClient *self);
-guint gmpd_client_get_timeout(GMpdClient *self);
-GMpdVersion *gmpd_client_get_version(GMpdClient *self);
+void            gmpd_client_close_async             (GMpdClient          *self,
+                                                     GCancellable        *cancellable,
+                                                     GAsyncReadyCallback  callback,
+                                                     gpointer             user_data);
 
+gboolean        gmpd_client_close_finish            (GMpdClient          *self,
+                                                     GAsyncResult        *callback,
+                                                     GError             **error);
 
-gboolean gmpd_client_close(GMpdClient *self, GCancellable *cancellable, GError **error);
+/*
+ * Properties
+ */
+void            gmpd_client_set_keepalive           (GMpdClient          *self,
+                                                     gboolean             keepalive);
 
-void gmpd_client_close_async(GMpdClient *self,
-                             GCancellable *cancellable,
-                             GAsyncReadyCallback callback,
-                             gpointer user_data);
+void            gmpd_client_set_timeout             (GMpdClient          *self,
+                                                     guint                timeout);
 
-gboolean gmpd_client_close_finish(GMpdClient *self, GAsyncResult *callback, GError **error);
-
-gboolean gmpd_client_clearerror(GMpdClient *self, GCancellable *cancellable, GError **error);
-
-void gmpd_client_clearerror_async(GMpdClient *self,
-                                  GCancellable *cancellable,
-                                  GAsyncReadyCallback callback,
-                                  gpointer user_data);
-
-GMpdSong *gmpd_client_currentsong(GMpdClient *self, GCancellable *cancellable, GError **error);
-
-void gmpd_client_currentsong_async(GMpdClient *self,
-                                   GCancellable *cancellable,
-                                   GAsyncReadyCallback callback,
-                                   gpointer user_data);
+GMainContext *  gmpd_client_get_context             (GMpdClient          *self);
+gchar *         gmpd_client_get_hostname            (GMpdClient          *self);
+guint16         gmpd_client_get_port                (GMpdClient          *self);
+gboolean        gmpd_client_get_keepalive           (GMpdClient          *self);
+guint           gmpd_client_get_timeout             (GMpdClient          *self);
+GMpdVersion *   gmpd_client_get_version             (GMpdClient          *self);
 
 
-GMpdIdle gmpd_client_idle(GMpdClient *self,
-                          GMpdIdle subsystems,
-                          GCancellable *cancellable,
-                          GError **error);
+/*
+ * Querying MPDs status
+ */
+gboolean        gmpd_client_clearerror              (GMpdClient          *self,
+                                                     GCancellable        *cancellable,
+                                                     GError             **error);
 
-void gmpd_client_idle_async(GMpdClient *self,
-                            GMpdIdle subsystems,
-                            GCancellable *cancellable,
-                            GAsyncReadyCallback callback,
-                            gpointer user_data);
+void            gmpd_client_clearerror_async        (GMpdClient          *self,
+                                                     GCancellable        *cancellable,
+                                                     GAsyncReadyCallback  callback,
+                                                     gpointer             user_data);
 
+GMpdSong *      gmpd_client_currentsong             (GMpdClient          *self,
+                                                     GCancellable        *cancellable,
+                                                     GError             **error);
 
-GMpdStatus *gmpd_client_status(GMpdClient *self, GCancellable *cancellable, GError **error);
-
-void gmpd_client_status_async(GMpdClient *self,
-                              GCancellable *cancellable,
-                              GAsyncReadyCallback callback,
-                              gpointer user_data);
-
-
-GMpdStats *gmpd_client_stats(GMpdClient *self, GCancellable *cancellable, GError **error);
-
-void gmpd_client_stats_async(GMpdClient *self,
-                             GCancellable *cancellable,
-                             GAsyncReadyCallback callback,
-                             gpointer user_data);
+void            gmpd_client_currentsong_async       (GMpdClient          *self,
+                                                     GCancellable        *cancellable,
+                                                     GAsyncReadyCallback  callback,
+                                                     gpointer             user_data);
 
 
-GMpdSong *gmpd_client_finish_song_response(GMpdClient *self, GAsyncResult *result, GError **error);
-GMpdIdle gmpd_client_finish_idle_response(GMpdClient *self, GAsyncResult *result, GError **error);
-GMpdStatus *gmpd_client_finish_status_response(GMpdClient *self, GAsyncResult *result, GError **error);
-GMpdStats *gmpd_client_finish_stats_response(GMpdClient *self, GAsyncResult *result, GError **error);
-gboolean gmpd_client_finish_void_response(GMpdClient *self, GAsyncResult *result, GError **error);
+GMpdIdle        gmpd_client_idle                    (GMpdClient          *self,
+                                                     GMpdIdle             subsystems,
+                                                     GCancellable        *cancellable,
+                                                     GError             **error);
+
+void            gmpd_client_idle_async              (GMpdClient          *self,
+                                                     GMpdIdle             subsystems,
+                                                     GCancellable        *cancellable,
+                                                     GAsyncReadyCallback  callback,
+                                                     gpointer             user_data);
+
+GMpdStatus *    gmpd_client_status                  (GMpdClient          *self,
+                                                     GCancellable        *cancellable,
+                                                     GError             **error);
+
+void            gmpd_client_status_async            (GMpdClient          *self,
+                                                     GCancellable        *cancellable,
+                                                     GAsyncReadyCallback  callback,
+                                                     gpointer             user_data);
+
+GMpdStats *     gmpd_client_stats                   (GMpdClient          *self,
+                                                     GCancellable        *cancellable,
+                                                     GError             **error);
+
+void            gmpd_client_stats_async             (GMpdClient          *self,
+                                                     GCancellable        *cancellable,
+                                                     GAsyncReadyCallback  callback,
+                                                     gpointer             user_data);
+
+
+/*
+ * Responses
+ */
+GMpdSong *      gmpd_client_finish_song_response    (GMpdClient          *self,
+                                                     GAsyncResult        *result,
+                                                     GError             **error);
+
+GMpdIdle        gmpd_client_finish_idle_response    (GMpdClient          *self,
+                                                     GAsyncResult        *result,
+                                                     GError             **error);
+
+GMpdStatus *    gmpd_client_finish_status_response  (GMpdClient          *self,
+                                                     GAsyncResult        *result,
+                                                     GError             **error);
+
+GMpdStats *     gmpd_client_finish_stats_response   (GMpdClient          *self,
+                                                     GAsyncResult        *result,
+                                                     GError             **error);
+
+gboolean        gmpd_client_finish_void_response    (GMpdClient          *self,
+                                                     GAsyncResult        *result,
+                                                     GError             **error);
 
 G_END_DECLS
 

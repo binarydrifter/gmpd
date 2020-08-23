@@ -29,8 +29,8 @@
 G_BEGIN_DECLS
 
 struct _GMpdEntity {
-	GObject __base__;
-	gchar *path;
+	GObject  __base__;
+	gchar     *path;
 	GDateTime *last_modified;
 };
 

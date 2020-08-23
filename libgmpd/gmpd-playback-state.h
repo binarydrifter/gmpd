@@ -40,10 +40,10 @@ typedef enum _GMpdPlaybackState {
 	GMPD_PLAYBACK_PLAYING,
 } GMpdPlaybackState;
 
-GType gmpd_playback_state_get_type(void);
+GType              gmpd_playback_state_get_type     (void);
 
-GMpdPlaybackState gmpd_playback_state_from_string(const gchar *s);
-gchar *gmpd_playback_state_to_string(GMpdPlaybackState state);
+GMpdPlaybackState  gmpd_playback_state_from_string  (const gchar      *s);
+gchar *            gmpd_playback_state_to_string    (GMpdPlaybackState state);
 
 G_END_DECLS
 

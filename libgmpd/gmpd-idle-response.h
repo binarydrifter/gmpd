@@ -47,24 +47,26 @@ G_BEGIN_DECLS
 #define GMPD_IDLE_RESPONSE_GET_CLASS(inst) \
 	(G_TYPE_INSTANCE_GET_CLASS((inst), GMPD_TYPE_IDLE_RESPONSE, GMpdIdleResponseClass))
 
-typedef struct _GMpdIdleResponse GMpdIdleResponse;
+typedef struct _GMpdIdleResponse      GMpdIdleResponse;
 typedef struct _GMpdIdleResponseClass GMpdIdleResponseClass;
 
 struct _GMpdIdleResponse {
 	GObject __base__;
-	GMpdIdle changed;
+	GMpdIdle  changed;
 };
 
 struct _GMpdIdleResponseClass {
 	GObjectClass __base__;
 };
 
-GType gmpd_idle_response_get_type(void);
+GType               gmpd_idle_response_get_type     (void);
 
-GMpdIdleResponse *gmpd_idle_response_new(void);
+GMpdIdleResponse *  gmpd_idle_response_new          (void);
 
-void gmpd_idle_response_set_changed(GMpdIdleResponse *self, GMpdIdle value);
-GMpdIdle gmpd_idle_response_get_changed(GMpdIdleResponse *self);
+void                gmpd_idle_response_set_changed  (GMpdIdleResponse *self,
+                                                     GMpdIdle          value);
+
+GMpdIdle            gmpd_idle_response_get_changed  (GMpdIdleResponse *self);
 
 G_END_DECLS
 
