@@ -34,6 +34,7 @@ typedef struct _GMpdTaskData {
 	volatile gint  ref_count;
 	gchar         *command;
 	GMpdResponse  *response;
+	GError        *error;
 } GMpdTaskData;
 
 GMpdTaskData *  gmpd_task_data_ref         (GMpdTaskData *self);

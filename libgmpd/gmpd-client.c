@@ -109,6 +109,7 @@ static gboolean gmpd_client_do_sync(GMpdClient *self,
                                     GCancellable *cancellable,
                                     GError **error);
 static gboolean gmpd_client_on_socket_ready(GSocket *socket, GIOCondition condition, GMpdClient *self);
+static void gmpd_client_return_task(GMpdClient *self, GTask *task);
 
 enum {
 	PROP_NONE,
@@ -1295,7 +1296,14 @@ gmpd_client_run_task(GMpdClient *self,
 		return NULL;
 	}
 
-	response = g_task_propagate_pointer(task, error);
+	if (data->error) {
+		if (error)
+			*error = g_error_copy(data->error);
+
+		response = NULL;
+	} else {
+		response = data->response ? g_object_ref(data->response) : NULL;
+	}
 
 	g_object_unref(task);
 
@@ -1371,11 +1379,11 @@ gmpd_client_start_task(GMpdClient *self,
 		LOCK(self);
 
 	if (!self->socket_connection) {
-		GError *err = g_error_new_literal(G_IO_ERROR,
-		                                  G_IO_ERROR_CLOSED,
-		                                  "The client is closed");
+		task_data->error = g_error_new_literal(G_IO_ERROR,
+		                                       G_IO_ERROR_CLOSED,
+		                                       "The client is closed");
 
-		g_task_return_error(task, err);
+		gmpd_client_return_task(self, g_object_ref(task));
 
 		if (!have_lock)
 			UNLOCK(self);
@@ -1411,6 +1419,9 @@ gmpd_client_do_disconnect(GMpdClient *self)
 
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 
+	if (self->socket_connection)
+		g_io_stream_close(G_IO_STREAM(self->socket_connection), NULL, NULL);
+
 	gmpd_client_destroy_input_source(self);
 	gmpd_client_destroy_output_source(self);
 
@@ -1421,11 +1432,13 @@ gmpd_client_do_disconnect(GMpdClient *self)
 	gmpd_client_do_set_version(self, NULL, TRUE);
 
 	while ((task = g_queue_pop_head(self->task_queue))) {
-		GError *err = g_error_new_literal(G_IO_ERROR,
+		GMpdTaskData *data = g_task_get_task_data(task);
+
+		data->error = g_error_new_literal(G_IO_ERROR,
 		                                  G_IO_ERROR_CLOSED,
 		                                  "The client is closed");
-		g_task_return_error(task, err);
-		g_object_unref(task);
+
+		gmpd_client_return_task(self, task);
 	}
 }
 
@@ -1516,19 +1529,20 @@ gmpd_client_do_flush(GMpdClient *self, GCancellable *cancellable, GError **error
 	result = g_output_stream_flush(G_OUTPUT_STREAM(self->output_stream), cancellable, &err);
 	if (!result) {
 		GTask *task;
+		GMpdTaskData *data;
 
 		if (IS_WOULD_BLOCK(err) || IS_CANCELLED(err)) {
 			g_propagate_error(error, err);
 			return FALSE;
 		}
 
-		if (error)
-			*error = g_error_copy(err);
-
 		task = G_TASK(g_queue_pop_head(self->task_queue));
-		g_task_return_error(task, err);
-		g_object_unref(task);
+		data = g_task_get_task_data(task);
 
+		data->error = g_error_copy(err);
+		g_propagate_error(error, err);
+
+		gmpd_client_return_task(self, task);
 		gmpd_client_do_disconnect(self);
 
 		return FALSE;
@@ -1555,15 +1569,12 @@ gmpd_client_do_fill(GMpdClient *self, GCancellable *cancellable, GError **error)
 		gboolean result;
 
 		if (!data->response) {
-			g_io_stream_close(G_IO_STREAM(self->socket_connection), NULL, NULL);
-
 			g_queue_pop_head(self->task_queue);
-			g_task_return_pointer(task, NULL, NULL);
-			g_object_unref(task);
+			gmpd_client_return_task(self, task);
 
 			gmpd_client_do_disconnect(self);
 
-			break;
+			return TRUE;
 		}
 
 		result = gmpd_response_deserialize(data->response,
@@ -1578,9 +1589,9 @@ gmpd_client_do_fill(GMpdClient *self, GCancellable *cancellable, GError **error)
 				return FALSE;
 			}
 
+			data->error = g_error_copy(err);
 			g_queue_pop_head(self->task_queue);
-			g_task_return_error(task, g_error_copy(err));
-			g_object_unref(task);
+			gmpd_client_return_task(self, task);
 
 			if (err->domain != GMPD_ERROR) {
 				g_propagate_error(error, err);
@@ -1594,8 +1605,7 @@ gmpd_client_do_fill(GMpdClient *self, GCancellable *cancellable, GError **error)
 		}
 
 		g_queue_pop_head(self->task_queue);
-		g_task_return_pointer(task, g_object_ref(data->response), g_object_unref);
-		g_object_unref(task);
+		gmpd_client_return_task(self, task);
 	}
 
 	gmpd_client_destroy_input_source(self);
@@ -1641,5 +1651,48 @@ gmpd_client_on_socket_ready(GSocket *socket, GIOCondition condition, GMpdClient 
 	UNLOCK(self);
 
 	return G_SOURCE_CONTINUE;
+}
+
+static gboolean
+return_task_now(gpointer data)
+{
+	GTask *task;
+	GMpdTaskData *task_data;
+
+	g_return_val_if_fail(G_IS_TASK(data), G_SOURCE_REMOVE);
+
+	task = G_TASK(data);
+	task_data = g_task_get_task_data(task);
+
+	if (task_data->error)
+		g_task_return_error(task, g_error_copy(task_data->error));
+
+	else if (task_data->response)
+		g_task_return_pointer(task, g_object_ref(task_data->response), g_object_unref);
+
+	else
+		g_task_return_pointer(task, NULL, NULL);
+
+	return G_SOURCE_REMOVE;
+}
+
+static void
+gmpd_client_return_task(GMpdClient *self, GTask *task)
+{
+	GSource *source;
+
+	g_return_if_fail(GMPD_IS_CLIENT(self));
+	g_return_if_fail(G_IS_TASK(task));
+
+	if (!self->context) {
+		g_object_unref(task);
+		return;
+	}
+
+	source = g_idle_source_new();
+
+	g_source_set_name(source, "[gmpd, gmpd-client.c] return_task_in_idle_cb");
+	g_source_set_callback(source, return_task_now, task, g_object_unref);
+	g_source_attach(source, self->context);
 }
 

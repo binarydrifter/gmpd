@@ -34,6 +34,7 @@ gmpd_task_data_new(gchar *command, GMpdResponse *response)
 	self->ref_count = 1;
 	self->command = command;
 	self->response = response;
+	self->error = NULL;
 
 	return self;
 }
@@ -58,6 +59,7 @@ gmpd_task_data_unref(GMpdTaskData *self)
 	if (g_atomic_int_dec_and_test(&self->ref_count)) {
 		g_clear_pointer(&self->command, g_free);
 		g_clear_object(&self->response);
+		g_clear_error(&self->error);
 
 		g_slice_free(GMpdTaskData, self);
 	}
