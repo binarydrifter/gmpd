@@ -16,32 +16,38 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef __GMPD_H__
-#define __GMPD_H__
+#ifndef __GMPD_OBJECT_PRIV_H__
+#define __GMPD_OBJECT_PRIV_H__
+
+#if !defined(__GMPD_BUILD__)
+#   error "This file is private to libgmpd and should not be included."
+#endif
 
 #include <gio/gio.h>
+#include <gmpd-object.h>
 
 G_BEGIN_DECLS
 
-#define __GMPD_H_INSIDE__
+struct _GMpdObject {
+	GObject     __base__;
+	GMutex        mutex;
+	GMainContext *context;
+};
 
-#include <gmpd-audio-format.h>
-#include <gmpd-client.h>
-#include <gmpd-entity.h>
-#include <gmpd-error.h>
-#include <gmpd-idle.h>
-#include <gmpd-object.h>
-#include <gmpd-option-state.h>
-#include <gmpd-playback-state.h>
-#include <gmpd-song.h>
-#include <gmpd-stats.h>
-#include <gmpd-status.h>
-#include <gmpd-tag.h>
-#include <gmpd-version.h>
+struct _GMpdObjectClass {
+	GObjectClass __base__;
+};
 
-#undef __GMPD_H_INSIDE__
+void   gmpd_object_lock            (GMpdObject     *self);
+void   gmpd_object_unlock          (GMpdObject     *self);
+
+guint  gmpd_object_run_in_context  (GMpdObject     *self,
+                                    GSourceFunc     callback,
+                                    gpointer        data,
+                                    GDestroyNotify  destroy,
+                                    gboolean        have_lock);
 
 G_END_DECLS
 
-#endif /* __GMPD_H__ */
+#endif /* __GMPD_OBJECT_PRIV_H__ */
 

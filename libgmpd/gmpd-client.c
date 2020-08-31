@@ -24,6 +24,7 @@
 #include "gmpd-idle.h"
 #include "gmpd-idle-response.h"
 #include "gmpd-object.h"
+#include "gmpd-object-priv.h"
 #include "gmpd-protocol.h"
 #include "gmpd-response.h"
 #include "gmpd-song.h"
@@ -50,22 +51,27 @@
 #define IS_CANCELLED(err) \
 	g_error_matches((err), G_IO_ERROR, G_IO_ERROR_CANCELLED)
 
+#define RETURN_TASK(self, task, have_lock) G_STMT_START { \
+	gmpd_object_run_in_context(GMPD_OBJECT((self)), \
+	                           return_task, \
+	                           task, \
+	                           g_object_unref, \
+	                           (have_lock)); \
+} G_STMT_END
+
 static void gmpd_client_initable_iface_init(GInitableIface *iface);
 static void gmpd_client_async_initable_iface_init(GAsyncInitable *iface G_GNUC_UNUSED);
 
-static void gmpd_client_do_set_context(GMpdClient *self, GMainContext *context, gboolean have_lock);
 static void gmpd_client_do_set_hostname(GMpdClient *self, const gchar *hostname, gboolean have_lock);
 static void gmpd_client_do_set_port(GMpdClient *self, guint16 port, gboolean have_lock);
 static void gmpd_client_do_set_keepalive(GMpdClient *self, gboolean keepalive, gboolean have_lock);
 static void gmpd_client_do_set_timeout(GMpdClient *self, guint timeout, gboolean have_lock);
 static void gmpd_client_do_set_version(GMpdClient *self, GMpdVersion *version, gboolean have_lock);
 
-static void gmpd_client_set_context(GMpdClient *self, GMainContext *context);
 static void gmpd_client_set_hostname(GMpdClient *self, const gchar *hostname);
 static void gmpd_client_set_port(GMpdClient *self, guint16 port);
 static void gmpd_client_set_version(GMpdClient *self, GMpdVersion *version) G_GNUC_UNUSED;
 
-static void gmpd_client_update_context(GMpdClient *self);
 static void gmpd_client_update_hostname(GMpdClient *self);
 static void gmpd_client_update_port(GMpdClient *self);
 static gboolean gmpd_client_connect_to_server(GMpdClient *self, GCancellable *cancellable, GError **error);
@@ -109,11 +115,10 @@ static gboolean gmpd_client_do_sync(GMpdClient *self,
                                     GCancellable *cancellable,
                                     GError **error);
 static gboolean gmpd_client_on_socket_ready(GSocket *socket, GIOCondition condition, GMpdClient *self);
-static void gmpd_client_return_task(GMpdClient *self, GTask *task);
+static gboolean return_task(gpointer data);
 
 enum {
 	PROP_NONE,
-	PROP_CONTEXT,
 	PROP_HOSTNAME,
 	PROP_PORT,
 	PROP_KEEPALIVE,
@@ -131,7 +136,6 @@ struct _GMpdClient {
 	GSource *input_source;
 	GSource *output_source;
 
-	GMainContext *context;
 	gchar *hostname;
 	guint16 port;
 	gboolean keepalive;
@@ -161,7 +165,6 @@ gmpd_client_initable_init(GInitable *initable, GCancellable *cancellable, GError
 
 	LOCK(self);
 
-	gmpd_client_update_context(self);
 	gmpd_client_update_hostname(self);
 	gmpd_client_update_port(self);
 
@@ -196,10 +199,6 @@ gmpd_client_set_property(GObject *object,
 	GMpdClient *self = GMPD_CLIENT(object);
 
 	switch (prop_id) {
-	case PROP_CONTEXT:
-		gmpd_client_set_context(self, g_value_get_boxed(value));
-		break;
-
 	case PROP_HOSTNAME:
 		gmpd_client_set_hostname(self, g_value_get_string(value));
 		break;
@@ -230,10 +229,6 @@ gmpd_client_get_property(GObject *object,
 	GMpdClient *self = GMPD_CLIENT(object);
 
 	switch (prop_id) {
-	case PROP_CONTEXT:
-		g_value_take_boxed(value, gmpd_client_get_context(self));
-		break;
-
 	case PROP_HOSTNAME:
 		g_value_take_string(value, gmpd_client_get_hostname(self));
 		break;
@@ -270,7 +265,6 @@ gmpd_client_finalize(GObject *object)
 	g_clear_object(&self->output_stream);
 	g_clear_object(&self->socket_connection);
 
-	g_clear_pointer(&self->context, g_main_context_unref);
 	g_clear_pointer(&self->hostname, g_free);
 	g_clear_object(&self->version);
 
@@ -285,16 +279,6 @@ gmpd_client_class_init(GMpdClientClass *klass)
 	object_class->set_property = gmpd_client_set_property;
 	object_class->get_property = gmpd_client_get_property;
 	object_class->finalize = gmpd_client_finalize;
-
-	PROPERTIES[PROP_CONTEXT] =
-		g_param_spec_boxed("context",
-		                   "Context",
-		                   "The GMainContext in which I/O will occur",
-		                   G_TYPE_MAIN_CONTEXT,
-		                   G_PARAM_READWRITE |
-		                   G_PARAM_CONSTRUCT_ONLY |
-		                   G_PARAM_EXPLICIT_NOTIFY |
-		                   G_PARAM_STATIC_STRINGS);
 
 	PROPERTIES[PROP_HOSTNAME] =
 		g_param_spec_string("hostname",
@@ -355,7 +339,6 @@ gmpd_client_init(GMpdClient *self)
 	self->input_source = NULL;
 	self->output_source = NULL;
 
-	self->context = NULL;
 	self->hostname = NULL;
 	self->port = 0;
 	self->keepalive = FALSE;
@@ -433,22 +416,6 @@ gmpd_client_set_timeout(GMpdClient *self, guint timeout)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 	gmpd_client_do_set_timeout(self, timeout, FALSE);
-}
-
-GMainContext *
-gmpd_client_get_context(GMpdClient *self)
-{
-	GMainContext *context;
-
-	g_return_val_if_fail(GMPD_IS_CLIENT(self), NULL);
-
-	LOCK(self);
-
-	context = self->context ? g_main_context_ref(self->context) : NULL;
-
-	UNLOCK(self);
-
-	return context;
 }
 
 gchar *
@@ -920,24 +887,6 @@ gmpd_client_finish_void_response(GMpdClient *self, GAsyncResult *result, GError 
 }
 
 static void
-gmpd_client_do_set_context(GMpdClient *self, GMainContext *context, gboolean have_lock)
-{
-	g_return_if_fail(GMPD_IS_CLIENT(self));
-
-	if (!have_lock)
-		LOCK(self);
-
-	if (self->context != context) {
-		g_clear_pointer(&self->context, g_main_context_unref);
-		self->context = context ? g_main_context_ref(context) : NULL;
-		NOTIFY(self, PROP_CONTEXT);
-	}
-
-	if (!have_lock)
-		UNLOCK(self);
-}
-
-static void
 gmpd_client_do_set_hostname(GMpdClient *self, const gchar *hostname, gboolean have_lock)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
@@ -1047,13 +996,6 @@ gmpd_client_do_set_version(GMpdClient *self, GMpdVersion *version, gboolean have
 }
 
 static void
-gmpd_client_set_context(GMpdClient *self, GMainContext *context)
-{
-	g_return_if_fail(GMPD_IS_CLIENT(self));
-	gmpd_client_do_set_context(self, context, FALSE);
-}
-
-static void
 gmpd_client_set_hostname(GMpdClient *self, const gchar *hostname)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
@@ -1073,21 +1015,6 @@ gmpd_client_set_version(GMpdClient *self, GMpdVersion *version)
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 	g_return_if_fail(version == NULL || GMPD_IS_VERSION(version));
 	gmpd_client_do_set_version(self, version, FALSE);
-}
-
-static void
-gmpd_client_update_context(GMpdClient *self)
-{
-	g_return_if_fail(GMPD_IS_CLIENT(self));
-
-	if (!self->context) {
-		GMainContext *context = g_main_context_ref_thread_default();
-
-		gmpd_client_do_set_context(self, context, TRUE);
-
-		if (context)
-			g_main_context_unref(context);
-	}
 }
 
 static void
@@ -1213,7 +1140,7 @@ gmpd_client_attach_input_source(GMpdClient *self)
 
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 
-	if (self->input_source || !self->socket_connection || !self->context)
+	if (self->input_source || !self->socket_connection || !GMPD_OBJECT(self)->context)
 		return;
 
 	socket = g_socket_connection_get_socket(self->socket_connection);
@@ -1224,7 +1151,7 @@ gmpd_client_attach_input_source(GMpdClient *self)
 	                      g_object_ref(self),
 	                      g_object_unref);
 
-	g_source_attach(self->input_source, self->context);
+	g_source_attach(self->input_source, GMPD_OBJECT(self)->context);
 }
 
 static void
@@ -1234,7 +1161,7 @@ gmpd_client_attach_output_source(GMpdClient *self)
 
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 
-	if (self->output_source || !self->socket_connection || !self->context)
+	if (self->output_source || !self->socket_connection || !GMPD_OBJECT(self)->context)
 		return;
 
 	socket = g_socket_connection_get_socket(self->socket_connection);
@@ -1245,7 +1172,7 @@ gmpd_client_attach_output_source(GMpdClient *self)
 	                      g_object_ref(self),
 	                      g_object_unref);
 
-	g_source_attach(self->output_source, self->context);
+	g_source_attach(self->output_source, GMPD_OBJECT(self)->context);
 }
 
 static void
@@ -1383,7 +1310,7 @@ gmpd_client_start_task(GMpdClient *self,
 		                                       G_IO_ERROR_CLOSED,
 		                                       "The client is closed");
 
-		gmpd_client_return_task(self, g_object_ref(task));
+		RETURN_TASK(self, g_object_ref(task), TRUE);
 
 		if (!have_lock)
 			UNLOCK(self);
@@ -1438,7 +1365,7 @@ gmpd_client_do_disconnect(GMpdClient *self)
 		                                  G_IO_ERROR_CLOSED,
 		                                  "The client is closed");
 
-		gmpd_client_return_task(self, task);
+		RETURN_TASK(self, task, TRUE);
 	}
 }
 
@@ -1542,7 +1469,7 @@ gmpd_client_do_flush(GMpdClient *self, GCancellable *cancellable, GError **error
 		data->error = g_error_copy(err);
 		g_propagate_error(error, err);
 
-		gmpd_client_return_task(self, task);
+		RETURN_TASK(self, task, TRUE);
 		gmpd_client_do_disconnect(self);
 
 		return FALSE;
@@ -1570,7 +1497,7 @@ gmpd_client_do_fill(GMpdClient *self, GCancellable *cancellable, GError **error)
 
 		if (!data->response) {
 			g_queue_pop_head(self->task_queue);
-			gmpd_client_return_task(self, task);
+			RETURN_TASK(self, task, TRUE);
 
 			gmpd_client_do_disconnect(self);
 
@@ -1591,7 +1518,7 @@ gmpd_client_do_fill(GMpdClient *self, GCancellable *cancellable, GError **error)
 
 			data->error = g_error_copy(err);
 			g_queue_pop_head(self->task_queue);
-			gmpd_client_return_task(self, task);
+			RETURN_TASK(self, task, TRUE);
 
 			if (err->domain != GMPD_ERROR) {
 				g_propagate_error(error, err);
@@ -1605,7 +1532,7 @@ gmpd_client_do_fill(GMpdClient *self, GCancellable *cancellable, GError **error)
 		}
 
 		g_queue_pop_head(self->task_queue);
-		gmpd_client_return_task(self, task);
+		RETURN_TASK(self, task, TRUE);
 	}
 
 	gmpd_client_destroy_input_source(self);
@@ -1654,7 +1581,7 @@ gmpd_client_on_socket_ready(GSocket *socket, GIOCondition condition, GMpdClient 
 }
 
 static gboolean
-return_task_now(gpointer data)
+return_task(gpointer data)
 {
 	GTask *task;
 	GMpdTaskData *task_data;
@@ -1674,25 +1601,5 @@ return_task_now(gpointer data)
 		g_task_return_pointer(task, NULL, NULL);
 
 	return G_SOURCE_REMOVE;
-}
-
-static void
-gmpd_client_return_task(GMpdClient *self, GTask *task)
-{
-	GSource *source;
-
-	g_return_if_fail(GMPD_IS_CLIENT(self));
-	g_return_if_fail(G_IS_TASK(task));
-
-	if (!self->context) {
-		g_object_unref(task);
-		return;
-	}
-
-	source = g_idle_source_new();
-
-	g_source_set_name(source, "[gmpd, gmpd-client.c] return_task_in_idle_cb");
-	g_source_set_callback(source, return_task_now, task, g_object_unref);
-	g_source_attach(source, self->context);
 }
 

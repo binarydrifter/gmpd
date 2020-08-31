@@ -19,8 +19,8 @@
 #ifndef __GMPD_OBJECT_H__
 #define __GMPD_OBJECT_H__
 
-#if !defined(__GMPD_BUILD__)
-#   error "This file is private to libgmpd and should not be included."
+#if !defined(__GMPD_H_INSIDE__) && !defined(__GMPD_BUILD__)
+#   error "Only <gmpd.h> can be included directly."
 #endif
 
 #include <gio/gio.h>
@@ -48,19 +48,8 @@ G_BEGIN_DECLS
 typedef struct _GMpdObject      GMpdObject;
 typedef struct _GMpdObjectClass GMpdObjectClass;
 
-struct _GMpdObject {
-	GObject __base__;
-	GMutex    mutex;
-};
-
-struct _GMpdObjectClass {
-	GObjectClass __base__;
-};
-
-GType gmpd_object_get_type  (void);
-
-void  gmpd_object_lock      (GMpdObject *self);
-void  gmpd_object_unlock    (GMpdObject *self);
+GType           gmpd_object_get_type     (void);
+GMainContext *  gmpd_object_get_context  (GMpdObject *self);
 
 G_END_DECLS
 
