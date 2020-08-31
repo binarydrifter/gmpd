@@ -258,6 +258,7 @@ static void
 gmpd_client_finalize(GObject *object)
 {
 	GMpdClient *self = GMPD_CLIENT(object);
+	GTask *task;
 
 	gmpd_client_destroy_input_source(self);
 	gmpd_client_destroy_output_source(self);
@@ -267,6 +268,11 @@ gmpd_client_finalize(GObject *object)
 
 	g_clear_pointer(&self->hostname, g_free);
 	g_clear_object(&self->version);
+
+	while ((task = g_queue_pop_head(self->task_queue)))
+		g_object_unref(task);
+
+	g_clear_pointer(&self->task_queue, g_queue_free);
 
 	G_OBJECT_CLASS(gmpd_client_parent_class)->finalize(object);
 }
