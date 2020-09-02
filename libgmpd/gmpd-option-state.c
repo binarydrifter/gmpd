@@ -63,7 +63,7 @@ gmpd_option_state_from_string(const gchar *s)
 		return GMPD_OPTION_ENABLED;
 
 	else if (g_strcmp0(s, "oneshot") == 0)
-		return GMPD_OPTION_ENABLED;
+		return GMPD_OPTION_ONESHOT;
 
 	else
 		return GMPD_OPTION_UNKNOWN;
