@@ -578,7 +578,7 @@ gboolean
 gmpd_client_clearerror(GMpdClient *self, GCancellable *cancellable, GError **error)
 {
 	GMpdResponse *response;
-	GError *err;
+	GError *err = NULL;
 	gboolean retval;
 
 	g_return_val_if_fail(GMPD_IS_CLIENT(self), FALSE);
