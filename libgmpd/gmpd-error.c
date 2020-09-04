@@ -26,55 +26,55 @@ static GRegex *gmpd_error_regex(void);
 static const GEnumValue GMPD_ERROR_ENUM_VALUES[] = {
 	{GMPD_ERROR_UNKNOWN,
 		"GMPD_ERROR_UNKNOWN",
-		"gmpd-error-unknown"},
+		"error-unknown"},
 
 	{GMPD_ERROR_NOT_LIST,
 		"GMPD_ERROR_NOT_LIST",
-		"gmpd-error-not-list"},
+		"error-not-list"},
 
 	{GMPD_ERROR_ARGUMENTS,
 		"GMPD_ERROR_ARGUMENTS",
-		"gmpd-error-arguments"},
+		"error-arguments"},
 
 	{GMPD_ERROR_PASSWORD,
 		"GMPD_ERROR_PASSWORD",
-		"gmpd-error-password"},
+		"error-password"},
 
 	{GMPD_ERROR_PERMISSION,
 		"GMPD_ERROR_PERMISSION",
-		"gmpd-error-permission"},
+		"error-permission"},
 
 	{GMPD_ERROR_COMMAND,
 		"GMPD_ERROR_COMMAND",
-		"gmpd-error-command"},
+		"error-command"},
 
 	{GMPD_ERROR_DOES_NOT_EXIST,
 		"GMPD_ERROR_DOES_NOT_EXIST",
-		"gmpd-error-does-not-exist"},
+		"error-does-not-exist"},
 
 	{GMPD_ERROR_PLAYLIST_MAX,
 		"GMPD_ERROR_PLAYLIST_MAX",
-		"gmpd-error-playlist-max"},
+		"error-playlist-max"},
 
 	{GMPD_ERROR_SYSTEM,
 		"GMPD_ERROR_SYSTEM",
-		"gmpd-error-system"},
+		"error-system"},
 
 	{GMPD_ERROR_PLAYLIST_LOAD,
 		"GMPD_ERROR_PLAYLIST_LOAD",
-		"gmpd-error-playlist-load"},
+		"error-playlist-load"},
 
 	{GMPD_ERROR_UPDATE_IN_PROGRESS,
 		"GMPD_ERROR_UPDATE_IN_PROGRESS",
-		"gmpd-error-update-in-progress"},
+		"error-update-in-progress"},
 
 	{GMPD_ERROR_OUT_OF_SYNC,
 		"GMPD_ERROR_OUT_OF_SYNC",
-		"gmpd-error-out-of-sync"},
+		"error-out-of-sync"},
 
 	{GMPD_ERROR_EXISTS,
 		"GMPD_ERROR_EXISTS",
-		"gmpd-error-exists"},
+		"error-exists"},
 
 	{0, NULL, NULL},
 };
