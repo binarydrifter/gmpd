@@ -47,20 +47,21 @@ enum {
 };
 
 struct _GMpdSong {
-	GMpdEntity __base__;
-	guint position;
-	guint id;
-	guint8 priority;
-	float duration;
-	float range_start;
-	float range_end;
+	GMpdEntity       __base__;
+	guint            position;
+	guint            id;
+	guint8           priority;
+	float            duration;
+	float            range_start;
+	float            range_end;
 	GMpdAudioFormat *format;
-	GPtrArray *tags[GMPD_N_TAGS];
+	GPtrArray       *tags[GMPD_N_TAGS];
 };
 
 struct _GMpdSongClass {
 	GMpdEntityClass __base__;
-	void (*tag_changed) (GMpdSong *self, GMpdTag tag);
+	void          (*tag_changed) (GMpdSong *self,
+                                      GMpdTag  tag);
 };
 
 G_DEFINE_TYPE_WITH_CODE(GMpdSong, gmpd_song, GMPD_TYPE_ENTITY,
@@ -71,20 +72,20 @@ static GParamSpec *PROPERTIES[N_PROPERTIES] = {NULL};
 static guint SIGNALS[N_SIGNALS] = {0};
 
 static void
-gmpd_song_response_feed_pair(GMpdResponse *_self,
-                             GMpdVersion *version,
-                             const gchar *key,
-                             const gchar *value)
+gmpd_song_response_feed_pair(GMpdResponse *response,
+                             GMpdVersion  *version,
+                             const gchar  *key,
+                             const gchar  *value)
 {
 	GMpdSong *self;
 	GMpdTag tag;
 
-	g_return_if_fail(GMPD_IS_SONG(_self));
+	g_return_if_fail(GMPD_IS_SONG(response));
 	g_return_if_fail(GMPD_IS_VERSION(version));
 	g_return_if_fail(key != NULL);
 	g_return_if_fail(value != NULL);
 
-	self = GMPD_SONG(_self);
+	self = GMPD_SONG(response);
 
 	if (!g_strcmp0(key, "file")) {
 		gmpd_entity_set_path(GMPD_ENTITY(self), value);
@@ -151,7 +152,8 @@ gmpd_song_response_iface_init(GMpdResponseIface *iface)
 }
 
 static void
-gmpd_song_tag_changed(GMpdSong *self, GMpdTag tag)
+gmpd_song_tag_changed(GMpdSong *self,
+                      GMpdTag   tag)
 {
 	GQuark detail;
 
@@ -163,10 +165,10 @@ gmpd_song_tag_changed(GMpdSong *self, GMpdTag tag)
 }
 
 static void
-gmpd_song_set_property(GObject *object,
-                       guint prop_id,
+gmpd_song_set_property(GObject      *object,
+                       guint         prop_id,
                        const GValue *value,
-                       GParamSpec *pspec)
+                       GParamSpec   *pspec)
 {
 	GMpdSong *self = GMPD_SONG(object);
 
@@ -205,9 +207,9 @@ gmpd_song_set_property(GObject *object,
 }
 
 static void
-gmpd_song_get_property(GObject *object,
-                       guint prop_id,
-                       GValue *value,
+gmpd_song_get_property(GObject    *object,
+                       guint       prop_id,
+                       GValue     *value,
                        GParamSpec *pspec)
 {
 	GMpdSong *self = GMPD_SONG(object);
@@ -379,7 +381,8 @@ gmpd_song_new(void)
 }
 
 void
-gmpd_song_set_position(GMpdSong *self, guint position)
+gmpd_song_set_position(GMpdSong *self,
+                       guint     position)
 {
 	g_return_if_fail(GMPD_IS_SONG(self));
 
@@ -390,7 +393,8 @@ gmpd_song_set_position(GMpdSong *self, guint position)
 }
 
 void
-gmpd_song_set_id(GMpdSong *self, guint id)
+gmpd_song_set_id(GMpdSong *self,
+                 guint     id)
 {
 	g_return_if_fail(GMPD_IS_SONG(self));
 
@@ -401,7 +405,8 @@ gmpd_song_set_id(GMpdSong *self, guint id)
 }
 
 void
-gmpd_song_set_priority(GMpdSong *self, guint8 priority)
+gmpd_song_set_priority(GMpdSong *self,
+                       guint8    priority)
 {
 	g_return_if_fail(GMPD_IS_SONG(self));
 
@@ -412,7 +417,8 @@ gmpd_song_set_priority(GMpdSong *self, guint8 priority)
 }
 
 void
-gmpd_song_set_duration(GMpdSong *self, float duration)
+gmpd_song_set_duration(GMpdSong *self,
+                       float     duration)
 {
 	g_return_if_fail(GMPD_IS_SONG(self));
 
@@ -423,7 +429,8 @@ gmpd_song_set_duration(GMpdSong *self, float duration)
 }
 
 void
-gmpd_song_set_range_start(GMpdSong *self, float range_start)
+gmpd_song_set_range_start(GMpdSong *self,
+                          float     range_start)
 {
 	g_return_if_fail(GMPD_IS_SONG(self));
 
@@ -434,7 +441,8 @@ gmpd_song_set_range_start(GMpdSong *self, float range_start)
 }
 
 void
-gmpd_song_set_range_end(GMpdSong *self, float range_end)
+gmpd_song_set_range_end(GMpdSong *self,
+                        float     range_end)
 {
 	g_return_if_fail(GMPD_IS_SONG(self));
 
@@ -445,7 +453,8 @@ gmpd_song_set_range_end(GMpdSong *self, float range_end)
 }
 
 void
-gmpd_song_set_format(GMpdSong *self, GMpdAudioFormat *format)
+gmpd_song_set_format(GMpdSong        *self,
+                     GMpdAudioFormat *format)
 {
 	g_return_if_fail(GMPD_IS_SONG(self));
 	g_return_if_fail(format == NULL || GMPD_IS_AUDIO_FORMAT(format));
@@ -458,7 +467,9 @@ gmpd_song_set_format(GMpdSong *self, GMpdAudioFormat *format)
 }
 
 void
-gmpd_song_set_tag(GMpdSong *self, GMpdTag tag, const gchar *const *values)
+gmpd_song_set_tag(GMpdSong           *self,
+                  GMpdTag             tag,
+                  const gchar *const *values)
 {
 	gsize values_len;
 	GPtrArray *new_tag;
@@ -539,7 +550,8 @@ gmpd_song_get_format(GMpdSong *self)
 }
 
 gchar **
-gmpd_song_get_tag(GMpdSong *self, GMpdTag tag)
+gmpd_song_get_tag(GMpdSong *self,
+                  GMpdTag   tag)
 {
 	g_return_val_if_fail(GMPD_IS_SONG(self), NULL);
 	g_return_val_if_fail(GMPD_TAG_IS_VALID(tag), NULL);

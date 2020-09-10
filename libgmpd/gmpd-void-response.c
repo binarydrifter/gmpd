@@ -20,7 +20,7 @@
 #include "gmpd-response.h"
 #include "gmpd-void-response.h"
 
-static void gmpd_void_response_iface_init(GMpdResponseIface *iface G_GNUC_UNUSED);
+static void gmpd_void_response_iface_init(GMpdResponseIface *iface);
 
 G_DEFINE_TYPE_WITH_CODE(GMpdVoidResponse, gmpd_void_response, G_TYPE_OBJECT,
                         G_IMPLEMENT_INTERFACE(GMPD_TYPE_RESPONSE,
@@ -33,8 +33,8 @@ gmpd_void_response_iface_init(GMpdResponseIface *iface G_GNUC_UNUSED)
 }
 
 static GObject *
-gmpd_void_response_constructor(GType type,
-                               guint n_properties,
+gmpd_void_response_constructor(GType                  type,
+                               guint                  n_properties,
                                GObjectConstructParam *properties)
 {
 	static gsize init = 0;

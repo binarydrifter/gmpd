@@ -32,10 +32,10 @@ G_DEFINE_ABSTRACT_TYPE(GMpdEntity, gmpd_entity, G_TYPE_OBJECT)
 static GParamSpec *PROPERTIES[N_PROPERTIES] = {NULL};
 
 static void
-gmpd_entity_set_property(GObject *object,
-                         guint prop_id,
+gmpd_entity_set_property(GObject      *object,
+                         guint         prop_id,
                          const GValue *value,
-                         GParamSpec *pspec)
+                         GParamSpec   *pspec)
 {
 	GMpdEntity *self = GMPD_ENTITY(object);
 
@@ -54,9 +54,9 @@ gmpd_entity_set_property(GObject *object,
 }
 
 static void
-gmpd_entity_get_property(GObject *object,
-                         guint prop_id,
-                         GValue *value,
+gmpd_entity_get_property(GObject    *object,
+                         guint       prop_id,
+                         GValue     *value,
                          GParamSpec *pspec)
 {
 	GMpdEntity *self = GMPD_ENTITY(object);
@@ -124,7 +124,8 @@ gmpd_entity_init(GMpdEntity *self)
 }
 
 void
-gmpd_entity_set_path(GMpdEntity *self, const gchar *path)
+gmpd_entity_set_path(GMpdEntity  *self,
+                     const gchar *path)
 {
 	g_return_if_fail(GMPD_IS_ENTITY(self));
 
@@ -135,7 +136,8 @@ gmpd_entity_set_path(GMpdEntity *self, const gchar *path)
 }
 
 void
-gmpd_entity_set_last_modified(GMpdEntity *self, GDateTime *last_modified)
+gmpd_entity_set_last_modified(GMpdEntity *self,
+                              GDateTime  *last_modified)
 {
 	g_return_if_fail(GMPD_IS_ENTITY(self));
 

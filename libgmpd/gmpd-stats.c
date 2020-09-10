@@ -35,14 +35,14 @@ enum {
 };
 
 struct _GMpdStats {
-	GObject __base__;
-	guint artists;
-	guint albums;
-	guint songs;
-	guint64 uptime;
-	guint64 db_playtime;
+	GObject    __base__;
+	guint      artists;
+	guint      albums;
+	guint      songs;
+	guint64    uptime;
+	guint64    db_playtime;
 	GDateTime *db_update;
-	guint64 playtime;
+	guint64    playtime;
 };
 
 struct _GMpdStatsClass {
@@ -57,9 +57,9 @@ static GParamSpec *PROPERTIES[N_PROPERTIES] = {NULL};
 
 static void
 gmpd_stats_response_feed_pair(GMpdResponse *response,
-                              GMpdVersion *version,
-                              const gchar *key,
-                              const gchar *value)
+                              GMpdVersion  *version,
+                              const gchar  *key,
+                              const gchar  *value)
 {
 	GMpdStats *self;
 
@@ -108,10 +108,10 @@ gmpd_stats_response_iface_init(GMpdResponseIface *iface)
 }
 
 static void
-gmpd_stats_set_property(GObject *object,
-                        guint prop_id,
+gmpd_stats_set_property(GObject      *object,
+                        guint         prop_id,
                         const GValue *value,
-                        GParamSpec *pspec)
+                        GParamSpec   *pspec)
 {
 	GMpdStats *self = GMPD_STATS(object);
 
@@ -150,9 +150,9 @@ gmpd_stats_set_property(GObject *object,
 }
 
 static void
-gmpd_stats_get_property(GObject *object,
-                        guint prop_id,
-                        GValue *value,
+gmpd_stats_get_property(GObject    *object,
+                        guint       prop_id,
+                        GValue     *value,
                         GParamSpec *pspec)
 {
 	GMpdStats *self = GMPD_STATS(object);
@@ -295,7 +295,8 @@ gmpd_stats_new(void)
 }
 
 void
-gmpd_stats_set_artists(GMpdStats *self, guint artists)
+gmpd_stats_set_artists(GMpdStats *self,
+                       guint      artists)
 {
 	g_return_if_fail(GMPD_IS_STATS(self));
 
@@ -306,7 +307,8 @@ gmpd_stats_set_artists(GMpdStats *self, guint artists)
 }
 
 void
-gmpd_stats_set_albums(GMpdStats *self, guint albums)
+gmpd_stats_set_albums(GMpdStats *self,
+                      guint      albums)
 {
 	g_return_if_fail(GMPD_IS_STATS(self));
 
@@ -317,7 +319,8 @@ gmpd_stats_set_albums(GMpdStats *self, guint albums)
 }
 
 void
-gmpd_stats_set_songs(GMpdStats *self, guint songs)
+gmpd_stats_set_songs(GMpdStats *self,
+                     guint      songs)
 {
 	g_return_if_fail(GMPD_IS_STATS(self));
 
@@ -328,7 +331,8 @@ gmpd_stats_set_songs(GMpdStats *self, guint songs)
 }
 
 void
-gmpd_stats_set_uptime(GMpdStats *self, guint64 uptime)
+gmpd_stats_set_uptime(GMpdStats *self,
+                      guint64    uptime)
 {
 	g_return_if_fail(GMPD_IS_STATS(self));
 
@@ -339,7 +343,8 @@ gmpd_stats_set_uptime(GMpdStats *self, guint64 uptime)
 }
 
 void
-gmpd_stats_set_db_playtime(GMpdStats *self, guint64 db_playtime)
+gmpd_stats_set_db_playtime(GMpdStats *self,
+                           guint64    db_playtime)
 {
 	g_return_if_fail(GMPD_IS_STATS(self));
 
@@ -350,7 +355,8 @@ gmpd_stats_set_db_playtime(GMpdStats *self, guint64 db_playtime)
 }
 
 void
-gmpd_stats_set_db_update(GMpdStats *self, GDateTime *db_update)
+gmpd_stats_set_db_update(GMpdStats *self,
+                         GDateTime *db_update)
 {
 	g_return_if_fail(GMPD_IS_STATS(self));
 
@@ -363,7 +369,8 @@ gmpd_stats_set_db_update(GMpdStats *self, GDateTime *db_update)
 }
 
 void
-gmpd_stats_set_playtime(GMpdStats *self, guint64 playtime)
+gmpd_stats_set_playtime(GMpdStats *self,
+                        guint64    playtime)
 {
 	g_return_if_fail(GMPD_IS_STATS(self));
 

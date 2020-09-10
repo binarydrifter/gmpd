@@ -44,10 +44,10 @@ G_DEFINE_ABSTRACT_TYPE(GMpdObject, gmpd_object, G_TYPE_OBJECT)
 static GParamSpec *PROPERTIES[N_PROPERTIES] = {NULL};
 
 static void
-gmpd_object_set_property(GObject *object,
-                         guint prop_id,
+gmpd_object_set_property(GObject      *object,
+                         guint         prop_id,
                          const GValue *value,
-                         GParamSpec *pspec)
+                         GParamSpec   *pspec)
 {
 	GMpdObject *self = GMPD_OBJECT(object);
 
@@ -62,9 +62,9 @@ gmpd_object_set_property(GObject *object,
 }
 
 static void
-gmpd_object_get_property(GObject *object,
-                         guint prop_id,
-                         GValue *value,
+gmpd_object_get_property(GObject    *object,
+                         guint       prop_id,
+                         GValue     *value,
                          GParamSpec *pspec)
 {
 	GMpdObject *self = GMPD_OBJECT(object);
@@ -91,8 +91,8 @@ gmpd_object_finalize(GObject *object)
 }
 
 static void
-gmpd_object_dispatch_properties_changed(GObject *object,
-                                        guint n_pspecs,
+gmpd_object_dispatch_properties_changed(GObject     *object,
+                                        guint        n_pspecs,
                                         GParamSpec **pspecs)
 {
 	GMpdObject *self = GMPD_OBJECT(object);
@@ -154,11 +154,11 @@ gmpd_object_unlock(GMpdObject *self)
 }
 
 guint
-gmpd_object_run_in_context(GMpdObject *self,
-                           GSourceFunc callback,
-                           gpointer data,
+gmpd_object_run_in_context(GMpdObject    *self,
+                           GSourceFunc    callback,
+                           gpointer       data,
                            GDestroyNotify destroy,
-                           gboolean have_lock)
+                           gboolean       have_lock)
 {
 	GSource *source;
 	guint source_id;
@@ -199,7 +199,8 @@ gmpd_object_get_context(GMpdObject *self)
 }
 
 static void
-gmpd_object_set_context(GMpdObject *self, GMainContext *context)
+gmpd_object_set_context(GMpdObject   *self,
+                        GMainContext *context)
 {
 	g_return_if_fail(GMPD_IS_OBJECT(self));
 
@@ -210,7 +211,9 @@ gmpd_object_set_context(GMpdObject *self, GMainContext *context)
 }
 
 static DispatchNotifyData *
-dispatch_notify_data_new(GObject *object, guint n_pspecs, GParamSpec **pspecs)
+dispatch_notify_data_new(GObject     *object,
+                         guint        n_pspecs,
+                         GParamSpec **pspecs)
 {
 	DispatchNotifyData *data;
 	guint i;

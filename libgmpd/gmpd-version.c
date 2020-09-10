@@ -19,10 +19,13 @@
 #include <gio/gio.h>
 #include "gmpd-version.h"
 
-static void gmpd_version_set_major(GMpdVersion *self, gint major);
-static void gmpd_version_set_minor(GMpdVersion *self, gint minor);
-static void gmpd_version_set_patch(GMpdVersion *self, gint patch);
-static GRegex *gmpd_version_regex(void);
+static void gmpd_version_set_major (GMpdVersion *self,
+                                    gint         major);
+static void gmpd_version_set_minor (GMpdVersion *self,
+                                    gint         minor);
+static void gmpd_version_set_patch (GMpdVersion *self,
+                                    gint         patch);
+static GRegex *gmpd_version_regex  (void);
 
 enum {
 	PROP_NONE,
@@ -34,9 +37,9 @@ enum {
 
 struct _GMpdVersion {
 	GObject __base__;
-	gint major;
-	gint minor;
-	gint patch;
+	gint    major;
+	gint    minor;
+	gint    patch;
 };
 
 struct _GMpdVersionClass {
@@ -48,10 +51,10 @@ G_DEFINE_TYPE(GMpdVersion, gmpd_version, G_TYPE_OBJECT)
 static GParamSpec *PROPERTIES[N_PROPERTIES] = {NULL};
 
 static void
-gmpd_version_set_property(GObject *object,
-                          guint prop_id,
+gmpd_version_set_property(GObject      *object,
+                          guint         prop_id,
                           const GValue *value,
-                          GParamSpec *pspec)
+                          GParamSpec   *pspec)
 {
 	GMpdVersion *self = GMPD_VERSION(object);
 
@@ -74,9 +77,9 @@ gmpd_version_set_property(GObject *object,
 }
 
 static void
-gmpd_version_get_property(GObject *object,
-                          guint prop_id,
-                          GValue *value,
+gmpd_version_get_property(GObject    *object,
+                          guint       prop_id,
+                          GValue     *value,
                           GParamSpec *pspec)
 {
 	GMpdVersion *self = GMPD_VERSION(object);
@@ -149,7 +152,9 @@ gmpd_version_init(GMpdVersion *self)
 }
 
 GMpdVersion *
-gmpd_version_new(gint major, gint minor, gint patch)
+gmpd_version_new(gint major,
+                 gint minor,
+                 gint patch)
 {
 	return g_object_new(GMPD_TYPE_VERSION,
 	                    "major", major,
@@ -195,7 +200,8 @@ gmpd_version_new_from_string(const gchar *s)
 }
 
 static void
-gmpd_version_set_major(GMpdVersion *self, gint major)
+gmpd_version_set_major(GMpdVersion *self,
+                       gint         major)
 {
 	g_return_if_fail(GMPD_IS_VERSION(self));
 
@@ -206,7 +212,8 @@ gmpd_version_set_major(GMpdVersion *self, gint major)
 }
 
 static void
-gmpd_version_set_minor(GMpdVersion *self, gint minor)
+gmpd_version_set_minor(GMpdVersion *self,
+                       gint         minor)
 {
 	g_return_if_fail(GMPD_IS_VERSION(self));
 
@@ -217,7 +224,8 @@ gmpd_version_set_minor(GMpdVersion *self, gint minor)
 }
 
 static void
-gmpd_version_set_patch(GMpdVersion *self, gint patch)
+gmpd_version_set_patch(GMpdVersion *self,
+                       gint         patch)
 {
 	g_return_if_fail(GMPD_IS_VERSION(self));
 
@@ -249,7 +257,8 @@ gmpd_version_get_patch(GMpdVersion *self)
 }
 
 gint
-gmpd_version_compare(GMpdVersion *lhs, GMpdVersion *rhs)
+gmpd_version_compare(GMpdVersion *lhs,
+                     GMpdVersion *rhs)
 {
 	int result;
 

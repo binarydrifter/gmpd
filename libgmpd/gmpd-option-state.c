@@ -20,22 +20,10 @@
 #include "gmpd-option-state.h"
 
 static const GEnumValue OPTION_STATE_VALUES[] = {
-	{GMPD_OPTION_UNKNOWN,
-	 "GMPD_OPTION_UNKNOWN",
-	 "option-unknown"},
-
-	{GMPD_OPTION_DISABLED,
-	 "GMPD_OPTION_DISABLED",
-	 "option-disabled"},
-
-	{GMPD_OPTION_ONESHOT,
-	 "GMPD_OPTION_ONESHOT",
-	 "option-oneshot"},
-
-	{GMPD_OPTION_ENABLED,
-	 "GMPD_OPTION_ENABLED",
-	 "option-enabled"},
-
+	{GMPD_OPTION_UNKNOWN,  "GMPD_OPTION_UNKNOWN",  "option-unknown"},
+	{GMPD_OPTION_DISABLED, "GMPD_OPTION_DISABLED", "option-disabled"},
+	{GMPD_OPTION_ONESHOT,  "GMPD_OPTION_ONESHOT",  "option-oneshot"},
+	{GMPD_OPTION_ENABLED,  "GMPD_OPTION_ENABLED",  "option-enabled"},
 	{0, NULL, NULL}
 };
 

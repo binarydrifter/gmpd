@@ -37,9 +37,9 @@ static GParamSpec *PROPERTIES[N_PROPERTIES] = {NULL};
 
 static void
 gmpd_idle_response_feed_pair(GMpdResponse *response,
-                             GMpdVersion *version,
-                             const gchar *key,
-                             const gchar *value)
+                             GMpdVersion  *version,
+                             const gchar  *key,
+                             const gchar  *value)
 {
 	GMpdIdleResponse *self;
 	GMpdIdle idle;
@@ -73,10 +73,10 @@ gmpd_idle_response_iface_init(GMpdResponseIface *iface)
 }
 
 static void
-gmpd_idle_response_set_property(GObject *object,
-                                guint prop_id,
+gmpd_idle_response_set_property(GObject      *object,
+                                guint         prop_id,
                                 const GValue *value,
-                                GParamSpec *pspec)
+                                GParamSpec   *pspec)
 {
 	GMpdIdleResponse *self = GMPD_IDLE_RESPONSE(object);
 
@@ -91,9 +91,9 @@ gmpd_idle_response_set_property(GObject *object,
 }
 
 static void
-gmpd_idle_response_get_property(GObject *object,
-                                guint prop_id,
-                                GValue *value,
+gmpd_idle_response_get_property(GObject    *object,
+                                guint       prop_id,
+                                GValue     *value,
                                 GParamSpec *pspec)
 {
 	GMpdIdleResponse *self = GMPD_IDLE_RESPONSE(object);
@@ -142,7 +142,8 @@ gmpd_idle_response_new(void)
 }
 
 void
-gmpd_idle_response_set_changed(GMpdIdleResponse *self, GMpdIdle changed)
+gmpd_idle_response_set_changed(GMpdIdleResponse *self,
+                               GMpdIdle          changed)
 {
 	g_return_if_fail(GMPD_IS_IDLE_RESPONSE(self));
 

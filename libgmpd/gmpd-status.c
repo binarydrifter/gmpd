@@ -55,29 +55,29 @@ enum {
 };
 
 struct _GMpdStatus {
-	GObject __base__;
-	gchar *partition;
-	gint8 volume;
-	GMpdOptionState repeat;
-	GMpdOptionState random;
-	GMpdOptionState single;
-	GMpdOptionState consume;
-	guint queue_version;
-	guint queue_length;
+	GObject           __base__;
+	gchar            *partition;
+	gint8             volume;
+	GMpdOptionState   repeat;
+	GMpdOptionState   random;
+	GMpdOptionState   single;
+	GMpdOptionState   consume;
+	guint             queue_version;
+	guint             queue_length;
 	GMpdPlaybackState playback;
-	guint current_position;
-	guint current_id;
-	guint next_position;
-	guint next_id;
-	gfloat current_elapsed;
-	gfloat current_duration;
-	guint bit_rate;
-	guint crossfade;
-	gfloat mixramp_db;
-	gfloat mixramp_delay;
-	GMpdAudioFormat *audio_format;
-	guint db_update_job_id;
-	gchar *error;
+	guint             current_position;
+	guint             current_id;
+	guint             next_position;
+	guint             next_id;
+	gfloat            current_elapsed;
+	gfloat            current_duration;
+	guint             bit_rate;
+	guint             crossfade;
+	gfloat            mixramp_db;
+	gfloat            mixramp_delay;
+	GMpdAudioFormat  *audio_format;
+	guint             db_update_job_id;
+	gchar            *error;
 };
 
 struct _GMpdStatusClass {
@@ -93,9 +93,9 @@ static GParamSpec *PROPERTIES[N_PROPERTIES] = {NULL};
 
 static void
 gmpd_status_response_feed_pair(GMpdResponse *response,
-                               GMpdVersion *version,
-                               const gchar *key,
-                               const gchar *value)
+                               GMpdVersion  *version,
+                               const gchar  *key,
+                               const gchar  *value)
 {
 	GMpdStatus *self;
 
@@ -187,10 +187,10 @@ gmpd_status_response_iface_init(GMpdResponseIface *iface)
 }
 
 static void
-gmpd_status_set_property(GObject *object,
-                         guint prop_id,
+gmpd_status_set_property(GObject      *object,
+                         guint         prop_id,
                          const GValue *value,
-                         GParamSpec *pspec)
+                         GParamSpec   *pspec)
 {
 	GMpdStatus *self = GMPD_STATUS(object);
 
@@ -289,9 +289,9 @@ gmpd_status_set_property(GObject *object,
 }
 
 static void
-gmpd_status_get_property(GObject *object,
-                         guint prop_id,
-                         GValue *value,
+gmpd_status_get_property(GObject    *object,
+                         guint       prop_id,
+                         GValue     *value,
                          GParamSpec *pspec)
 {
 	GMpdStatus *self = GMPD_STATUS(object);
@@ -655,7 +655,8 @@ gmpd_status_new(void)
 }
 
 void
-gmpd_status_set_partition(GMpdStatus *self, const gchar *partition)
+gmpd_status_set_partition(GMpdStatus  *self,
+                          const gchar *partition)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
@@ -664,7 +665,8 @@ gmpd_status_set_partition(GMpdStatus *self, const gchar *partition)
 }
 
 void
-gmpd_status_set_volume(GMpdStatus *self, gint8 volume)
+gmpd_status_set_volume(GMpdStatus *self,
+                       gint8       volume)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
@@ -676,7 +678,8 @@ gmpd_status_set_volume(GMpdStatus *self, gint8 volume)
 }
 
 void
-gmpd_status_set_repeat(GMpdStatus *self, GMpdOptionState repeat)
+gmpd_status_set_repeat(GMpdStatus     *self,
+                       GMpdOptionState repeat)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
@@ -688,7 +691,8 @@ gmpd_status_set_repeat(GMpdStatus *self, GMpdOptionState repeat)
 }
 
 void
-gmpd_status_set_random(GMpdStatus *self, GMpdOptionState random)
+gmpd_status_set_random(GMpdStatus     *self,
+                       GMpdOptionState random)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
@@ -700,7 +704,8 @@ gmpd_status_set_random(GMpdStatus *self, GMpdOptionState random)
 }
 
 void
-gmpd_status_set_single(GMpdStatus *self, GMpdOptionState single)
+gmpd_status_set_single(GMpdStatus     *self,
+                       GMpdOptionState single)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
@@ -712,7 +717,8 @@ gmpd_status_set_single(GMpdStatus *self, GMpdOptionState single)
 }
 
 void
-gmpd_status_set_consume(GMpdStatus *self, GMpdOptionState consume)
+gmpd_status_set_consume(GMpdStatus     *self,
+                        GMpdOptionState consume)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 	g_return_if_fail(GMPD_IS_OPTION_STATE(consume));
@@ -725,7 +731,8 @@ gmpd_status_set_consume(GMpdStatus *self, GMpdOptionState consume)
 }
 
 void
-gmpd_status_set_queue_version(GMpdStatus *self, guint queue_version)
+gmpd_status_set_queue_version(GMpdStatus *self,
+                              guint       queue_version)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
@@ -734,7 +741,8 @@ gmpd_status_set_queue_version(GMpdStatus *self, guint queue_version)
 }
 
 void
-gmpd_status_set_queue_length(GMpdStatus *self, guint queue_length)
+gmpd_status_set_queue_length(GMpdStatus *self,
+                             guint       queue_length)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
@@ -743,7 +751,8 @@ gmpd_status_set_queue_length(GMpdStatus *self, guint queue_length)
 }
 
 void
-gmpd_status_set_playback(GMpdStatus *self, GMpdPlaybackState playback)
+gmpd_status_set_playback(GMpdStatus       *self,
+                         GMpdPlaybackState playback)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 	g_return_if_fail(GMPD_IS_PLAYBACK_STATE(playback));
@@ -756,7 +765,8 @@ gmpd_status_set_playback(GMpdStatus *self, GMpdPlaybackState playback)
 }
 
 void
-gmpd_status_set_current_position(GMpdStatus *self, guint current_position)
+gmpd_status_set_current_position(GMpdStatus *self,
+                                 guint       current_position)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
@@ -765,7 +775,8 @@ gmpd_status_set_current_position(GMpdStatus *self, guint current_position)
 }
 
 void
-gmpd_status_set_current_id(GMpdStatus *self, guint current_id)
+gmpd_status_set_current_id(GMpdStatus *self,
+                           guint       current_id)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
@@ -774,7 +785,8 @@ gmpd_status_set_current_id(GMpdStatus *self, guint current_id)
 }
 
 void
-gmpd_status_set_next_position(GMpdStatus *self, guint next_position)
+gmpd_status_set_next_position(GMpdStatus *self,
+                              guint       next_position)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
@@ -783,7 +795,8 @@ gmpd_status_set_next_position(GMpdStatus *self, guint next_position)
 }
 
 void
-gmpd_status_set_next_id(GMpdStatus *self, guint next_id)
+gmpd_status_set_next_id(GMpdStatus *self,
+                        guint       next_id)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
@@ -792,7 +805,8 @@ gmpd_status_set_next_id(GMpdStatus *self, guint next_id)
 }
 
 void
-gmpd_status_set_current_elapsed(GMpdStatus *self, gfloat current_elapsed)
+gmpd_status_set_current_elapsed(GMpdStatus *self,
+                                gfloat      current_elapsed)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
@@ -804,7 +818,8 @@ gmpd_status_set_current_elapsed(GMpdStatus *self, gfloat current_elapsed)
 }
 
 void
-gmpd_status_set_current_duration(GMpdStatus *self, gfloat current_duration)
+gmpd_status_set_current_duration(GMpdStatus *self,
+                                 gfloat      current_duration)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
@@ -816,7 +831,8 @@ gmpd_status_set_current_duration(GMpdStatus *self, gfloat current_duration)
 }
 
 void
-gmpd_status_set_bit_rate(GMpdStatus *self, guint bit_rate)
+gmpd_status_set_bit_rate(GMpdStatus *self,
+                         guint       bit_rate)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
@@ -825,7 +841,8 @@ gmpd_status_set_bit_rate(GMpdStatus *self, guint bit_rate)
 }
 
 void
-gmpd_status_set_crossfade(GMpdStatus *self, guint crossfade)
+gmpd_status_set_crossfade(GMpdStatus *self,
+                          guint       crossfade)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
@@ -834,7 +851,8 @@ gmpd_status_set_crossfade(GMpdStatus *self, guint crossfade)
 }
 
 void
-gmpd_status_set_mixramp_db(GMpdStatus *self, gfloat mixramp_db)
+gmpd_status_set_mixramp_db(GMpdStatus *self,
+                           gfloat      mixramp_db)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
@@ -843,7 +861,8 @@ gmpd_status_set_mixramp_db(GMpdStatus *self, gfloat mixramp_db)
 }
 
 void
-gmpd_status_set_mixramp_delay(GMpdStatus *self, gfloat mixramp_delay)
+gmpd_status_set_mixramp_delay(GMpdStatus *self,
+                              gfloat      mixramp_delay)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
@@ -855,7 +874,8 @@ gmpd_status_set_mixramp_delay(GMpdStatus *self, gfloat mixramp_delay)
 }
 
 void
-gmpd_status_set_audio_format(GMpdStatus *self, GMpdAudioFormat *audio_format)
+gmpd_status_set_audio_format(GMpdStatus      *self,
+                             GMpdAudioFormat *audio_format)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 	g_return_if_fail(audio_format == NULL || GMPD_IS_AUDIO_FORMAT(audio_format));
@@ -866,7 +886,8 @@ gmpd_status_set_audio_format(GMpdStatus *self, GMpdAudioFormat *audio_format)
 }
 
 void
-gmpd_status_set_db_update_job_id(GMpdStatus *self, guint db_update_job_id)
+gmpd_status_set_db_update_job_id(GMpdStatus *self,
+                                 guint       db_update_job_id)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
@@ -875,7 +896,8 @@ gmpd_status_set_db_update_job_id(GMpdStatus *self, guint db_update_job_id)
 }
 
 void
-gmpd_status_set_error(GMpdStatus *self, const gchar *error)
+gmpd_status_set_error(GMpdStatus  *self,
+                      const gchar *error)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 

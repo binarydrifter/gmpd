@@ -52,113 +52,51 @@ static const gchar *const GMPD_TAG_NAMES[] =
 G_STATIC_ASSERT(G_N_ELEMENTS(GMPD_TAG_NAMES) - 1 == GMPD_N_TAGS);
 
 static const GEnumValue GMPD_TAG_VALUES[] = {
-	{ GMPD_TAG_UNKNOWN
-	, "GMPD_TAG_UNKNOWN"
-	, "tag-unknown" },
+	{GMPD_TAG_UNKNOWN,           "GMPD_TAG_UNKNOWN",           "tag-unknown"},
+	{GMPD_TAG_ARTIST,            "GMPD_TAG_ARTIST",            "tag-artist"},
+	{GMPD_TAG_ARTIST_SORT,       "GMPD_TAG_ARTIST_SORT",       "tag-artist-sort"},
+	{GMPD_TAG_ALBUM,             "GMPD_TAG_ALBUM",             "tag-album"},
+	{GMPD_TAG_ALBUM_SORT,        "GMPD_TAG_ALBUM_SORT",        "tag-album-sort"},
+	{GMPD_TAG_ALBUM_ARTIST,      "GMPD_TAG_ALBUM_ARTIST",      "tag-album-artist"},
+	{GMPD_TAG_ALBUM_ARTIST_SORT, "GMPD_TAG_ALBUM_ARTIST_SORT", "tag-album-artist-sort"},
+	{GMPD_TAG_TITLE,             "GMPD_TAG_TITLE",             "tag-title"},
+	{GMPD_TAG_TRACK,             "GMPD_TAG_TRACK",             "tag-track"},
+	{GMPD_TAG_NAME,              "GMPD_TAG_NAME",              "tag-name"},
+	{GMPD_TAG_GENRE,             "GMPD_TAG_GENRE",             "tag-genre"},
+	{GMPD_TAG_DATE,              "GMPD_TAG_DATE",              "tag-date"},
+	{GMPD_TAG_ORIGINAL_DATE,     "GMPD_TAG_ORIGINAL_DATE",     "tag-original-date"},
+	{GMPD_TAG_COMPOSER,          "GMPD_TAG_COMPOSER",          "tag-composer"},
+	{GMPD_TAG_PERFORMER,         "GMPD_TAG_PERFORMER",         "tag-performer"},
+	{GMPD_TAG_CONDUCTOR,         "GMPD_TAG_CONDUCTOR",         "tag-conductor"},
+	{GMPD_TAG_WORK,              "GMPD_TAG_WORK",              "tag-work"},
+	{GMPD_TAG_GROUPING,          "GMPD_TAG_GROUPING",          "tag-grouping"},
+	{GMPD_TAG_COMMENT,           "GMPD_TAG_COMMENT",           "tag-comment"},
+	{GMPD_TAG_DISC,              "GMPD_TAG_DISC",              "tag-disc"},
+	{GMPD_TAG_LABEL,             "GMPD_TAG_LABEL",             "tag-label"},
 
-	{ GMPD_TAG_ARTIST
-	, "GMPD_TAG_ARTIST"
-	, "tag-artist" },
+	{GMPD_TAG_MUSICBRAINZ_ARTIST_ID,
+		"GMPD_TAG_MUSICBRAINZ_ARTIST_ID",
+		"tag-musicbrainz-artist-id"},
 
-	{ GMPD_TAG_ARTIST_SORT
-	, "GMPD_TAG_ARTIST_SORT"
-	, "tag-artist-sort" },
+	{GMPD_TAG_MUSICBRAINZ_ALBUM_ID,
+		"GMPD_TAG_MUSICBRAINZ_ALBUM_ID",
+		"tag-musicbrainz-album-id"},
 
-	{ GMPD_TAG_ALBUM
-	, "GMPD_TAG_ALBUM"
-	, "tag-album" },
+	{GMPD_TAG_MUSICBRAINZ_ALBUM_ARTIST_ID,
+		"GMPD_TAG_MUSICBRAINZ_ALBUM_ARTIST_ID",
+		"tag-musicbrainz-album-artist-id"},
 
-	{ GMPD_TAG_ALBUM_SORT
-	, "GMPD_TAG_ALBUM_SORT"
-	, "tag-album-sort" },
+	{GMPD_TAG_MUSICBRAINZ_TRACK_ID,
+		"GMPD_TAG_MUSICBRAINZ_TRACK_ID",
+		"tag-musicbrainz-track-id"},
 
-	{ GMPD_TAG_ALBUM_ARTIST
-	, "GMPD_TAG_ALBUM_ARTIST"
-	, "tag-album-artist" },
+	{GMPD_TAG_MUSICBRAINZ_RELEASE_TRACK_ID,
+		"GMPD_TAG_MUSICBRAINZ_RELEASE_TRACK_ID",
+		"tag-musicbrainz-release-track-id"},
 
-	{ GMPD_TAG_ALBUM_ARTIST_SORT
-	, "GMPD_TAG_ALBUM_ARTIST_SORT"
-	, "tag-album-artist-sort" },
-
-	{ GMPD_TAG_TITLE
-	, "GMPD_TAG_TITLE"
-	, "tag-title" },
-
-	{ GMPD_TAG_TRACK
-	, "GMPD_TAG_TRACK"
-	, "tag-track" },
-
-	{ GMPD_TAG_NAME
-	, "GMPD_TAG_NAME"
-	, "tag-name" },
-
-	{ GMPD_TAG_GENRE
-	, "GMPD_TAG_GENRE"
-	, "tag-genre" },
-
-	{ GMPD_TAG_DATE
-	, "GMPD_TAG_DATE"
-	, "tag-date" },
-
-	{ GMPD_TAG_ORIGINAL_DATE
-	, "GMPD_TAG_ORIGINAL_DATE"
-	, "tag-original-date" },
-
-	{ GMPD_TAG_COMPOSER
-	, "GMPD_TAG_COMPOSER"
-	, "tag-composer" },
-
-	{ GMPD_TAG_PERFORMER
-	, "GMPD_TAG_PERFORMER"
-	, "tag-performer" },
-
-	{ GMPD_TAG_CONDUCTOR
-	, "GMPD_TAG_CONDUCTOR"
-	, "tag-conductor" },
-
-	{ GMPD_TAG_WORK
-	, "GMPD_TAG_WORK"
-	, "tag-work" },
-
-	{ GMPD_TAG_GROUPING
-	, "GMPD_TAG_GROUPING"
-	, "tag-grouping" },
-
-	{ GMPD_TAG_COMMENT
-	, "GMPD_TAG_COMMENT"
-	, "tag-comment" },
-
-	{ GMPD_TAG_DISC
-	, "GMPD_TAG_DISC"
-	, "tag-disc" },
-
-	{ GMPD_TAG_LABEL
-	, "GMPD_TAG_LABEL"
-	, "tag-label" },
-
-	{ GMPD_TAG_MUSICBRAINZ_ARTIST_ID
-	, "GMPD_TAG_MUSICBRAINZ_ARTIST_ID"
-	, "tag-musicbrainz-artist-id" },
-
-	{ GMPD_TAG_MUSICBRAINZ_ALBUM_ID
-	, "GMPD_TAG_MUSICBRAINZ_ALBUM_ID"
-	, "tag-musicbrainz-album-id" },
-
-	{ GMPD_TAG_MUSICBRAINZ_ALBUM_ARTIST_ID
-	, "GMPD_TAG_MUSICBRAINZ_ALBUM_ARTIST_ID"
-	, "tag-musicbrainz-album-artist-id" },
-
-	{ GMPD_TAG_MUSICBRAINZ_TRACK_ID
-	, "GMPD_TAG_MUSICBRAINZ_TRACK_ID"
-	, "tag-musicbrainz-track-id" },
-
-	{ GMPD_TAG_MUSICBRAINZ_RELEASE_TRACK_ID
-	, "GMPD_TAG_MUSICBRAINZ_RELEASE_TRACK_ID"
-	, "tag-musicbrainz-release-track-id" },
-
-	{ GMPD_TAG_MUSICBRAINZ_WORK_ID
-	, "GMPD_TAG_MUSICBRAINZ_WORK_ID"
-	, "tag-musicbrainz-work-id" },
+	{GMPD_TAG_MUSICBRAINZ_WORK_ID,
+		"GMPD_TAG_MUSICBRAINZ_WORK_ID",
+		"tag-musicbrainz-work-id"},
 
 	{ 0, NULL, NULL },
 };

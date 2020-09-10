@@ -32,8 +32,8 @@ enum {
 struct _GMpdAudioFormat {
 	GObject __base__;
 	guint32 sample_rate;
-	guint8 bit_depth;
-	guint8 channels;
+	guint8  bit_depth;
+	guint8  channels;
 };
 
 struct _GMpdAudioFormatClass {
@@ -45,10 +45,10 @@ G_DEFINE_TYPE(GMpdAudioFormat, gmpd_audio_format, G_TYPE_OBJECT)
 static GParamSpec *PROPERTIES[N_PROPERTIES] = { NULL };
 
 static void
-gmpd_audio_format_set_property(GObject *object,
-                              guint prop_id,
+gmpd_audio_format_set_property(GObject     *object,
+                              guint         prop_id,
                               const GValue *value,
-                              GParamSpec *pspec)
+                              GParamSpec   *pspec)
 {
 	GMpdAudioFormat *self = GMPD_AUDIO_FORMAT(object);
 
@@ -71,9 +71,9 @@ gmpd_audio_format_set_property(GObject *object,
 }
 
 static void
-gmpd_audio_format_get_property(GObject *object,
-                              guint prop_id,
-                              GValue *value,
+gmpd_audio_format_get_property(GObject   *object,
+                              guint       prop_id,
+                              GValue     *value,
                               GParamSpec *pspec)
 {
 	GMpdAudioFormat *self = GMPD_AUDIO_FORMAT(object);
@@ -186,7 +186,8 @@ gmpd_audio_format_new_from_string(const gchar *s)
 }
 
 void
-gmpd_audio_format_set_sample_rate(GMpdAudioFormat *self, guint32 sample_rate)
+gmpd_audio_format_set_sample_rate(GMpdAudioFormat *self,
+                                  guint32          sample_rate)
 {
 	g_return_if_fail(self != NULL);
 
@@ -197,7 +198,8 @@ gmpd_audio_format_set_sample_rate(GMpdAudioFormat *self, guint32 sample_rate)
 }
 
 void
-gmpd_audio_format_set_bit_depth(GMpdAudioFormat *self, guint8 bit_depth)
+gmpd_audio_format_set_bit_depth(GMpdAudioFormat *self,
+                                guint8           bit_depth)
 {
 	g_return_if_fail(self != NULL);
 
@@ -208,7 +210,8 @@ gmpd_audio_format_set_bit_depth(GMpdAudioFormat *self, guint8 bit_depth)
 }
 
 void
-gmpd_audio_format_set_channels(GMpdAudioFormat *self, guint8 channels)
+gmpd_audio_format_set_channels(GMpdAudioFormat *self,
+                               guint8           channels)
 {
 	g_return_if_fail(self != NULL);
 

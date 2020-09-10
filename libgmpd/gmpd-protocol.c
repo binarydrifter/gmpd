@@ -27,7 +27,8 @@
 #include "gmpd-void-response.h"
 
 static GMpdTaskData *
-gmpd_task_data_new(gchar *command, GMpdResponse *response)
+gmpd_task_data_new(gchar        *command,
+                   GMpdResponse *response)
 {
 	GMpdTaskData *self = g_slice_new(GMpdTaskData);
 

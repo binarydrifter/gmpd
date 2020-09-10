@@ -20,22 +20,10 @@
 #include "gmpd-playback-state.h"
 
 static const GEnumValue PLAYBACK_STATE_VALUES[] = {
-	{GMPD_PLAYBACK_UNKNOWN,
-	 "GMPD_PLAYBACK_UNKNOWN",
-	 "playback-unknown"},
-
-	{GMPD_PLAYBACK_STOPPED,
-	 "GMPD_PLAYBACK_STOPPED",
-	 "playback-stopped"},
-
-	{GMPD_PLAYBACK_PAUSED,
-	 "GMPD_PLAYBACK_PAUSED",
-	 "playback-paused"},
-
-	{GMPD_PLAYBACK_PLAYING,
-	 "GMPD_PLAYBACK_PLAYING",
-	 "playback-playing"},
-
+	{GMPD_PLAYBACK_UNKNOWN, "GMPD_PLAYBACK_UNKNOWN", "playback-unknown"},
+	{GMPD_PLAYBACK_STOPPED, "GMPD_PLAYBACK_STOPPED", "playback-stopped"},
+	{GMPD_PLAYBACK_PAUSED,  "GMPD_PLAYBACK_PAUSED",  "playback-paused"},
+	{GMPD_PLAYBACK_PLAYING, "GMPD_PLAYBACK_PLAYING", "playback-playing"},
 	{0, NULL, NULL}
 };
 

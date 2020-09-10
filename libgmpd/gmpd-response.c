@@ -21,37 +21,40 @@
 #include "gmpd-response.h"
 #include "gmpd-version.h"
 
-G_DEFINE_INTERFACE(GMpdResponse, gmpd_response, G_TYPE_OBJECT)
-
-static void gmpd_response_default_init(GMpdResponseIface *iface G_GNUC_UNUSED);
+static void gmpd_response_default_init(GMpdResponseIface *iface);
 
 static void gmpd_response_feed_pair(GMpdResponse *self,
-                                    GMpdVersion *version,
-                                    const gchar *key,
-                                    const gchar *value);
+                                    GMpdVersion  *version,
+                                    const gchar  *key,
+                                    const gchar  *value);
 
-static void gmpd_response_feed_binary(GMpdResponse *self, GMpdVersion *version, GBytes *binary);
+static void gmpd_response_feed_binary(GMpdResponse *self,
+                                      GMpdVersion  *version,
+                                      GBytes       *binary);
+
 static gsize gmpd_response_get_remaining_binary(GMpdResponse *self);
 
 static gboolean deserialize_binary(GMpdResponse *self,
-                                   GMpdVersion *version,
+                                   GMpdVersion  *version,
                                    GInputStream *input_stream,
                                    GCancellable *cancellable,
-                                   GError **error);
+                                   GError      **error);
+
+G_DEFINE_INTERFACE(GMpdResponse, gmpd_response, G_TYPE_OBJECT)
 
 static void
 gmpd_response_default_feed_pair(GMpdResponse *self,
-                                GMpdVersion *version G_GNUC_UNUSED,
-                                const gchar *key G_GNUC_UNUSED,
-                                const gchar *value G_GNUC_UNUSED)
+                                GMpdVersion  *version G_GNUC_UNUSED,
+                                const gchar  *key     G_GNUC_UNUSED,
+                                const gchar  *value   G_GNUC_UNUSED)
 {
 	g_critical("%s does not implement GMpdResponse::feed_pair()", G_OBJECT_TYPE_NAME(self));
 }
 
 static void
 gmpd_response_default_feed_binary(GMpdResponse *self,
-                                  GMpdVersion *version G_GNUC_UNUSED,
-                                  GBytes *binary G_GNUC_UNUSED)
+                                  GMpdVersion  *version G_GNUC_UNUSED,
+                                  GBytes       *binary  G_GNUC_UNUSED)
 {
 	g_critical("%s does not implement GMpdResponse::feed_binary()", G_OBJECT_TYPE_NAME(self));
 }
@@ -72,9 +75,9 @@ gmpd_response_default_init(GMpdResponseIface *iface)
 
 static void
 gmpd_response_feed_pair(GMpdResponse *self,
-                        GMpdVersion *version,
-                        const gchar *key,
-                        const gchar *value)
+                        GMpdVersion  *version,
+                        const gchar  *key,
+                        const gchar  *value)
 {
 	GMpdResponseIface *iface;
 
@@ -91,7 +94,9 @@ gmpd_response_feed_pair(GMpdResponse *self,
 }
 
 static void
-gmpd_response_feed_binary(GMpdResponse *self, GMpdVersion *version, GBytes *binary)
+gmpd_response_feed_binary(GMpdResponse *self,
+                          GMpdVersion  *version,
+                          GBytes       *binary)
 {
 	GMpdResponseIface *iface;
 
@@ -122,10 +127,10 @@ gmpd_response_get_remaining_binary(GMpdResponse *self)
 
 static gboolean
 deserialize_binary(GMpdResponse *self,
-                   GMpdVersion *version,
+                   GMpdVersion  *version,
                    GInputStream *input_stream,
                    GCancellable *cancellable,
-                   GError **error)
+                   GError      **error)
 {
 	gsize remaining;
 
@@ -154,11 +159,11 @@ deserialize_binary(GMpdResponse *self,
 }
 
 gboolean
-gmpd_response_deserialize(GMpdResponse *self,
-                          GMpdVersion *version,
+gmpd_response_deserialize(GMpdResponse     *self,
+                          GMpdVersion      *version,
                           GDataInputStream *data_stream,
-                          GCancellable *cancellable,
-                          GError **error)
+                          GCancellable     *cancellable,
+                          GError          **error)
 {
 	g_return_val_if_fail(GMPD_IS_RESPONSE(self), FALSE);
 	g_return_val_if_fail(GMPD_IS_VERSION(version), FALSE);

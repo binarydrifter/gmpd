@@ -60,62 +60,98 @@
 } G_STMT_END
 
 static void gmpd_client_initable_iface_init(GInitableIface *iface);
-static void gmpd_client_async_initable_iface_init(GAsyncInitable *iface G_GNUC_UNUSED);
+static void gmpd_client_async_initable_iface_init(GAsyncInitable *iface);
 
-static void gmpd_client_do_set_hostname(GMpdClient *self, const gchar *hostname, gboolean have_lock);
-static void gmpd_client_do_set_port(GMpdClient *self, guint16 port, gboolean have_lock);
-static void gmpd_client_do_set_keepalive(GMpdClient *self, gboolean keepalive, gboolean have_lock);
-static void gmpd_client_do_set_timeout(GMpdClient *self, guint timeout, gboolean have_lock);
-static void gmpd_client_do_set_version(GMpdClient *self, GMpdVersion *version, gboolean have_lock);
+static void gmpd_client_do_set_hostname(GMpdClient  *self,
+                                        const gchar *hostname,
+                                        gboolean     have_lock);
 
-static void gmpd_client_set_hostname(GMpdClient *self, const gchar *hostname);
-static void gmpd_client_set_port(GMpdClient *self, guint16 port);
-static void gmpd_client_set_version(GMpdClient *self, GMpdVersion *version) G_GNUC_UNUSED;
+static void gmpd_client_do_set_port(GMpdClient *self,
+                                    guint16     port,
+                                    gboolean    have_lock);
+
+static void gmpd_client_do_set_keepalive(GMpdClient *self,
+                                         gboolean    keepalive,
+                                         gboolean    have_lock);
+
+static void gmpd_client_do_set_timeout(GMpdClient *self,
+                                       guint       timeout,
+                                       gboolean    have_lock);
+
+static void gmpd_client_do_set_version(GMpdClient  *self,
+                                       GMpdVersion *version,
+                                       gboolean     have_lock);
+
+static void gmpd_client_set_hostname(GMpdClient  *self,
+                                     const gchar *hostname);
+
+static void gmpd_client_set_port(GMpdClient *self,
+                                 guint16     port);
+
+static void gmpd_client_set_version(GMpdClient  *self,
+                                    GMpdVersion *version) G_GNUC_UNUSED;
 
 static void gmpd_client_update_hostname(GMpdClient *self);
 static void gmpd_client_update_port(GMpdClient *self);
-static gboolean gmpd_client_connect_to_server(GMpdClient *self, GCancellable *cancellable, GError **error);
-static gboolean gmpd_client_receive_version(GMpdClient *self, GCancellable *cancellable, GError **error);
+
+static gboolean gmpd_client_connect_to_server(GMpdClient   *self,
+                                              GCancellable *cancellable,
+                                              GError      **error);
+
+static gboolean gmpd_client_receive_version(GMpdClient   *self,
+                                            GCancellable *cancellable,
+                                            GError      **error);
 
 static void gmpd_client_attach_input_source(GMpdClient *self);
 static void gmpd_client_attach_output_source(GMpdClient *self);
 static void gmpd_client_destroy_input_source(GMpdClient *self);
 static void gmpd_client_destroy_output_source(GMpdClient *self);
 
-static GMpdResponse *gmpd_client_run_task(GMpdClient *self,
-                                          gboolean have_lock,
+static GMpdResponse *gmpd_client_run_task(GMpdClient   *self,
+                                          gboolean      have_lock,
                                           GMpdTaskData *data,
                                           GCancellable *cancellable,
-                                          GError **error);
+                                          GError      **error);
 
-static void gmpd_client_run_task_async(GMpdClient *self,
-                                       gboolean have_lock,
-                                       GMpdTaskData *data,
-                                       GCancellable *cancellable,
+static void gmpd_client_run_task_async(GMpdClient         *self,
+                                       gboolean            have_lock,
+                                       GMpdTaskData       *data,
+                                       GCancellable       *cancellable,
                                        GAsyncReadyCallback callback,
-                                       gpointer user_data);
+                                       gpointer            user_data);
 
-static GTask *gmpd_client_start_task(GMpdClient *self,
-                                     gboolean have_lock,
-                                     GMpdTaskData *task_data,
-                                     GCancellable *cancellable,
+static GTask *gmpd_client_start_task(GMpdClient         *self,
+                                     gboolean            have_lock,
+                                     GMpdTaskData       *task_data,
+                                     GCancellable       *cancellable,
                                      GAsyncReadyCallback callback,
-                                     gpointer user_data);
+                                     gpointer            user_data);
 
 static void gmpd_client_do_disconnect(GMpdClient *self);
 static void gmpd_client_update_timeout(GMpdClient *self);
 static gboolean gmpd_client_is_idle(GMpdClient *self);
 static void gmpd_client_disable_timeout(GMpdClient *self);
 static void gmpd_client_enable_timeout(GMpdClient *self);
-static gboolean gmpd_client_do_flush(GMpdClient *self, GCancellable *cancellable, GError **error);
-static gboolean gmpd_client_do_fill(GMpdClient *self, GCancellable *cancellable, GError **error);
-static gboolean gmpd_client_do_sync(GMpdClient *self,
-                                    GIOCondition condition,
-                                    gboolean blocking_io,
+
+static gboolean gmpd_client_do_flush(GMpdClient   *self,
+                                     GCancellable *cancellable,
+                                     GError      **error);
+
+static gboolean gmpd_client_do_fill(GMpdClient   *self,
                                     GCancellable *cancellable,
-                                    GError **error);
-static gboolean gmpd_client_on_socket_ready(GSocket *socket, GIOCondition condition, GMpdClient *self);
-static gboolean return_task(gpointer data);
+                                    GError      **error);
+
+static gboolean gmpd_client_do_sync(GMpdClient   *self,
+                                    GIOCondition  condition,
+                                    gboolean      blocking_io,
+                                    GCancellable *cancellable,
+                                    GError      **error);
+
+static gboolean gmpd_client_on_socket_ready(GSocket     *socket,
+                                            GIOCondition condition,
+                                            GMpdClient  *self);
+
+static gboolean return_task (gpointer data);
 
 enum {
 	PROP_NONE,
@@ -128,21 +164,21 @@ enum {
 };
 
 struct _GMpdClient {
-	GMpdObject __base__;
+	GMpdObject             __base__;
 
-	GSocketConnection *socket_connection;
-	GDataInputStream *input_stream;
+	GSocketConnection     *socket_connection;
+	GDataInputStream      *input_stream;
 	GBufferedOutputStream *output_stream;
-	GSource *input_source;
-	GSource *output_source;
+	GSource               *input_source;
+	GSource               *output_source;
 
-	gchar *hostname;
-	guint16 port;
-	gboolean keepalive;
-	guint timeout;
-	GMpdVersion *version;
+	gchar                 *hostname;
+	guint16                port;
+	gboolean               keepalive;
+	guint                  timeout;
+	GMpdVersion           *version;
 
-	GQueue *task_queue;
+	GQueue                *task_queue;
 };
 
 struct _GMpdClientClass {
@@ -158,7 +194,9 @@ G_DEFINE_TYPE_WITH_CODE(GMpdClient, gmpd_client, GMPD_TYPE_OBJECT,
 static GParamSpec *PROPERTIES[N_PROPERTIES] = {NULL};
 
 static gboolean
-gmpd_client_initable_init(GInitable *initable, GCancellable *cancellable, GError **error)
+gmpd_client_initable_init(GInitable    *initable,
+                          GCancellable *cancellable,
+                          GError      **error)
 {
 	GMpdClient *self = GMPD_CLIENT(initable);
 	gboolean result;
@@ -191,10 +229,10 @@ gmpd_client_async_initable_iface_init(GAsyncInitable *iface G_GNUC_UNUSED)
 }
 
 static void
-gmpd_client_set_property(GObject *object,
-                         guint prop_id,
+gmpd_client_set_property(GObject      *object,
+                         guint         prop_id,
                          const GValue *value,
-                         GParamSpec *pspec)
+                         GParamSpec   *pspec)
 {
 	GMpdClient *self = GMPD_CLIENT(object);
 
@@ -221,9 +259,9 @@ gmpd_client_set_property(GObject *object,
 }
 
 static void
-gmpd_client_get_property(GObject *object,
-                         guint prop_id,
-                         GValue *value,
+gmpd_client_get_property(GObject    *object,
+                         guint       prop_id,
+                         GValue     *value,
                          GParamSpec *pspec)
 {
 	GMpdClient *self = GMPD_CLIENT(object);
@@ -355,17 +393,17 @@ gmpd_client_init(GMpdClient *self)
 }
 
 GMpdClient *
-gmpd_client_connect(const gchar *hostname,
-                    guint16 port,
+gmpd_client_connect(const gchar  *hostname,
+                    guint16       port,
                     GCancellable *cancellable,
-                    GError **error)
+                    GError      **error)
 {
 	GMainContext *context = g_main_context_ref_thread_default();
 
 	GMpdClient *client = g_initable_new(GMPD_TYPE_CLIENT, cancellable, error,
-	                                    "context", context,
+	                                    "context",  context,
 	                                    "hostname", hostname,
-	                                    "port", port, NULL);
+	                                    "port",     port, NULL);
 
 	if (context)
 		g_main_context_unref(context);
@@ -374,26 +412,27 @@ gmpd_client_connect(const gchar *hostname,
 }
 
 void
-gmpd_client_connect_async(const gchar *hostname,
-                          guint16 port,
-                          GCancellable *cancellable,
+gmpd_client_connect_async(const gchar        *hostname,
+                          guint16             port,
+                          GCancellable       *cancellable,
                           GAsyncReadyCallback callback,
-                          gpointer user_data)
+                          gpointer            user_data)
 {
 	GMainContext *context = g_main_context_ref_thread_default();
 
 	g_async_initable_new_async(GMPD_TYPE_CLIENT, G_PRIORITY_DEFAULT,
 	                           cancellable, callback, user_data,
-	                           "context", context,
+	                           "context",  context,
 	                           "hostname", hostname,
-	                           "port", port, NULL);
+	                           "port",     port, NULL);
 
 	if (context)
 		g_main_context_unref(context);
 }
 
 GMpdClient *
-gmpd_client_connect_finish(GAsyncResult *result, GError **error)
+gmpd_client_connect_finish(GAsyncResult *result,
+                           GError      **error)
 {
 	GAsyncInitable *source_object;
 	GMpdClient *client;
@@ -411,14 +450,16 @@ gmpd_client_connect_finish(GAsyncResult *result, GError **error)
 }
 
 void
-gmpd_client_set_keepalive(GMpdClient *self, gboolean keepalive)
+gmpd_client_set_keepalive(GMpdClient *self,
+                          gboolean    keepalive)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 	gmpd_client_do_set_keepalive(self, keepalive, FALSE);
 }
 
 void
-gmpd_client_set_timeout(GMpdClient *self, guint timeout)
+gmpd_client_set_timeout(GMpdClient *self,
+                        guint       timeout)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 	gmpd_client_do_set_timeout(self, timeout, FALSE);
@@ -505,7 +546,9 @@ gmpd_client_get_version(GMpdClient *self)
 }
 
 gboolean
-gmpd_client_close(GMpdClient *self, GCancellable *cancellable, GError **error)
+gmpd_client_close(GMpdClient   *self,
+                  GCancellable *cancellable,
+                  GError      **error)
 {
 	GError *err = NULL;
 	GMpdResponse *response;
@@ -529,10 +572,10 @@ gmpd_client_close(GMpdClient *self, GCancellable *cancellable, GError **error)
 }
 
 void
-gmpd_client_close_async(GMpdClient *self,
-                        GCancellable *cancellable,
+gmpd_client_close_async(GMpdClient         *self,
+                        GCancellable       *cancellable,
                         GAsyncReadyCallback callback,
-                        gpointer user_data)
+                        gpointer            user_data)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 	g_return_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable));
@@ -547,7 +590,9 @@ gmpd_client_close_async(GMpdClient *self,
 }
 
 gboolean
-gmpd_client_close_finish(GMpdClient *self, GAsyncResult *result, GError **error)
+gmpd_client_close_finish(GMpdClient   *self,
+                         GAsyncResult *result,
+                         GError      **error)
 {
 	GTask *task;
 	GError *err = NULL;
@@ -575,7 +620,9 @@ gmpd_client_close_finish(GMpdClient *self, GAsyncResult *result, GError **error)
 }
 
 gboolean
-gmpd_client_clearerror(GMpdClient *self, GCancellable *cancellable, GError **error)
+gmpd_client_clearerror(GMpdClient   *self,
+                       GCancellable *cancellable,
+                       GError      **error)
 {
 	GMpdResponse *response;
 	GError *err = NULL;
@@ -604,10 +651,10 @@ gmpd_client_clearerror(GMpdClient *self, GCancellable *cancellable, GError **err
 }
 
 void
-gmpd_client_clearerror_async(GMpdClient *self,
-                             GCancellable *cancellable,
+gmpd_client_clearerror_async(GMpdClient         *self,
+                             GCancellable       *cancellable,
                              GAsyncReadyCallback callback,
-                             gpointer user_data)
+                             gpointer            user_data)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 	g_return_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable));
@@ -623,7 +670,9 @@ gmpd_client_clearerror_async(GMpdClient *self,
 }
 
 GMpdSong *
-gmpd_client_currentsong(GMpdClient *self, GCancellable *cancellable, GError **error)
+gmpd_client_currentsong(GMpdClient   *self,
+                        GCancellable *cancellable,
+                        GError      **error)
 {
 	GMpdResponse *response;
 
@@ -641,10 +690,10 @@ gmpd_client_currentsong(GMpdClient *self, GCancellable *cancellable, GError **er
 }
 
 void
-gmpd_client_currentsong_async(GMpdClient *self,
-                              GCancellable *cancellable,
+gmpd_client_currentsong_async(GMpdClient         *self,
+                              GCancellable       *cancellable,
                               GAsyncReadyCallback callback,
-                              gpointer user_data)
+                              gpointer            user_data)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 	g_return_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable));
@@ -659,10 +708,10 @@ gmpd_client_currentsong_async(GMpdClient *self,
 }
 
 GMpdIdle
-gmpd_client_idle(GMpdClient *self,
-                 GMpdIdle subsystems,
+gmpd_client_idle(GMpdClient   *self,
+                 GMpdIdle      subsystems,
                  GCancellable *cancellable,
-                 GError **error)
+                 GError      **error)
 {
 	GMpdResponse *response;
 	GMpdIdle idle;
@@ -688,11 +737,11 @@ gmpd_client_idle(GMpdClient *self,
 }
 
 void
-gmpd_client_idle_async(GMpdClient *self,
-                       GMpdIdle subsystems,
-                       GCancellable *cancellable,
+gmpd_client_idle_async(GMpdClient         *self,
+                       GMpdIdle            subsystems,
+                       GCancellable       *cancellable,
                        GAsyncReadyCallback callback,
-                       gpointer user_data)
+                       gpointer            user_data)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 	g_return_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable));
@@ -707,7 +756,9 @@ gmpd_client_idle_async(GMpdClient *self,
 }
 
 GMpdStatus *
-gmpd_client_status(GMpdClient *self, GCancellable *cancellable, GError **error)
+gmpd_client_status(GMpdClient   *self,
+                   GCancellable *cancellable,
+                   GError      **error)
 {
 	GMpdResponse *response;
 
@@ -725,10 +776,10 @@ gmpd_client_status(GMpdClient *self, GCancellable *cancellable, GError **error)
 }
 
 void
-gmpd_client_status_async(GMpdClient *self,
-                         GCancellable *cancellable,
+gmpd_client_status_async(GMpdClient         *self,
+                         GCancellable       *cancellable,
                          GAsyncReadyCallback callback,
-                         gpointer user_data)
+                         gpointer            user_data)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 	g_return_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable));
@@ -743,7 +794,9 @@ gmpd_client_status_async(GMpdClient *self,
 }
 
 GMpdStats *
-gmpd_client_stats(GMpdClient *self, GCancellable *cancellable, GError **error)
+gmpd_client_stats(GMpdClient   *self,
+                  GCancellable *cancellable,
+                  GError      **error)
 {
 	GMpdResponse *response;
 
@@ -761,10 +814,10 @@ gmpd_client_stats(GMpdClient *self, GCancellable *cancellable, GError **error)
 }
 
 void
-gmpd_client_stats_async(GMpdClient *self,
-                        GCancellable *cancellable,
+gmpd_client_stats_async(GMpdClient         *self,
+                        GCancellable       *cancellable,
                         GAsyncReadyCallback callback,
-                        gpointer user_data)
+                        gpointer            user_data)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 	g_return_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable));
@@ -779,7 +832,9 @@ gmpd_client_stats_async(GMpdClient *self,
 }
 
 GMpdSong *
-gmpd_client_finish_song_response(GMpdClient *self, GAsyncResult *result, GError **error)
+gmpd_client_finish_song_response(GMpdClient   *self,
+                                 GAsyncResult *result,
+                                 GError      **error)
 {
 	GTask *task;
 	gpointer retval;
@@ -798,7 +853,9 @@ gmpd_client_finish_song_response(GMpdClient *self, GAsyncResult *result, GError 
 }
 
 GMpdIdle
-gmpd_client_finish_idle_response(GMpdClient *self, GAsyncResult *result, GError **error)
+gmpd_client_finish_idle_response(GMpdClient   *self,
+                                 GAsyncResult *result,
+                                 GError      **error)
 {
 	GTask *task;
 	gpointer idle_resp;
@@ -825,7 +882,9 @@ gmpd_client_finish_idle_response(GMpdClient *self, GAsyncResult *result, GError 
 }
 
 GMpdStatus *
-gmpd_client_finish_status_response(GMpdClient *self, GAsyncResult *result, GError **error)
+gmpd_client_finish_status_response(GMpdClient   *self,
+                                   GAsyncResult *result,
+                                   GError      **error)
 {
 	GTask *task;
 	gpointer retval;
@@ -844,7 +903,9 @@ gmpd_client_finish_status_response(GMpdClient *self, GAsyncResult *result, GErro
 }
 
 GMpdStats *
-gmpd_client_finish_stats_response(GMpdClient *self, GAsyncResult *result, GError **error)
+gmpd_client_finish_stats_response(GMpdClient   *self,
+                                  GAsyncResult *result,
+                                  GError      **error)
 {
 	GTask *task;
 	gpointer retval;
@@ -863,7 +924,9 @@ gmpd_client_finish_stats_response(GMpdClient *self, GAsyncResult *result, GError
 }
 
 gboolean
-gmpd_client_finish_void_response(GMpdClient *self, GAsyncResult *result, GError **error)
+gmpd_client_finish_void_response(GMpdClient   *self,
+                                 GAsyncResult *result,
+                                 GError      **error)
 {
 	GTask *task;
 	GMpdVoidResponse *response;
@@ -893,7 +956,9 @@ gmpd_client_finish_void_response(GMpdClient *self, GAsyncResult *result, GError 
 }
 
 static void
-gmpd_client_do_set_hostname(GMpdClient *self, const gchar *hostname, gboolean have_lock)
+gmpd_client_do_set_hostname(GMpdClient  *self,
+                            const gchar *hostname,
+                            gboolean     have_lock)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 
@@ -909,7 +974,9 @@ gmpd_client_do_set_hostname(GMpdClient *self, const gchar *hostname, gboolean ha
 }
 
 static void
-gmpd_client_do_set_port(GMpdClient *self, guint16 port, gboolean have_lock)
+gmpd_client_do_set_port(GMpdClient *self,
+                        guint16     port,
+                        gboolean    have_lock)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 
@@ -926,7 +993,9 @@ gmpd_client_do_set_port(GMpdClient *self, guint16 port, gboolean have_lock)
 }
 
 static void
-gmpd_client_do_set_keepalive(GMpdClient *self, gboolean keepalive, gboolean have_lock)
+gmpd_client_do_set_keepalive(GMpdClient *self,
+                             gboolean    keepalive,
+                             gboolean    have_lock)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 
@@ -949,7 +1018,9 @@ gmpd_client_do_set_keepalive(GMpdClient *self, gboolean keepalive, gboolean have
 }
 
 static void
-gmpd_client_do_set_timeout(GMpdClient *self, guint timeout, gboolean have_lock)
+gmpd_client_do_set_timeout(GMpdClient *self,
+                           guint       timeout,
+                           gboolean    have_lock)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 
@@ -983,7 +1054,9 @@ gmpd_client_do_set_timeout(GMpdClient *self, guint timeout, gboolean have_lock)
 }
 
 static void
-gmpd_client_do_set_version(GMpdClient *self, GMpdVersion *version, gboolean have_lock)
+gmpd_client_do_set_version(GMpdClient  *self,
+                           GMpdVersion *version,
+                           gboolean     have_lock)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 	g_return_if_fail(version == NULL || GMPD_IS_VERSION(version));
@@ -1002,21 +1075,24 @@ gmpd_client_do_set_version(GMpdClient *self, GMpdVersion *version, gboolean have
 }
 
 static void
-gmpd_client_set_hostname(GMpdClient *self, const gchar *hostname)
+gmpd_client_set_hostname(GMpdClient  *self,
+                         const gchar *hostname)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 	gmpd_client_do_set_hostname(self, hostname, FALSE);
 }
 
 static void
-gmpd_client_set_port(GMpdClient *self, guint16 port)
+gmpd_client_set_port(GMpdClient *self,
+                     guint16     port)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 	gmpd_client_do_set_port(self, port, FALSE);
 }
 
 static void
-gmpd_client_set_version(GMpdClient *self, GMpdVersion *version)
+gmpd_client_set_version(GMpdClient  *self,
+                        GMpdVersion *version)
 {
 	g_return_if_fail(GMPD_IS_CLIENT(self));
 	g_return_if_fail(version == NULL || GMPD_IS_VERSION(version));
@@ -1063,7 +1139,9 @@ gmpd_client_update_port(GMpdClient *self)
 }
 
 static gboolean
-gmpd_client_connect_to_server(GMpdClient *self, GCancellable *cancellable, GError **error)
+gmpd_client_connect_to_server(GMpdClient   *self,
+                              GCancellable *cancellable,
+                              GError      **error)
 {
 	GSocketConnectable *socket_connectable;
 	GSocketClient *socket_client;
@@ -1108,7 +1186,9 @@ gmpd_client_connect_to_server(GMpdClient *self, GCancellable *cancellable, GErro
 }
 
 static gboolean
-gmpd_client_receive_version(GMpdClient *self, GCancellable *cancellable, GError **error)
+gmpd_client_receive_version(GMpdClient   *self,
+                            GCancellable *cancellable,
+                            GError      **error)
 {
 	GError *err = NULL;
 	gchar *line;
@@ -1204,11 +1284,11 @@ gmpd_client_destroy_output_source(GMpdClient *self)
 }
 
 static GMpdResponse *
-gmpd_client_run_task(GMpdClient *self,
-                     gboolean have_lock,
+gmpd_client_run_task(GMpdClient   *self,
+                     gboolean      have_lock,
                      GMpdTaskData *data,
                      GCancellable *cancellable,
-                     GError **error)
+                     GError      **error)
 {
 	GTask *task;
 	gboolean result;
@@ -1247,12 +1327,12 @@ gmpd_client_run_task(GMpdClient *self,
 }
 
 static void
-gmpd_client_run_task_async(GMpdClient *self,
-                           gboolean have_lock,
-                           GMpdTaskData *data,
-                           GCancellable *cancellable,
+gmpd_client_run_task_async(GMpdClient         *self,
+                           gboolean            have_lock,
+                           GMpdTaskData       *data,
+                           GCancellable       *cancellable,
                            GAsyncReadyCallback callback,
-                           gpointer user_data)
+                           gpointer            user_data)
 {
 	GTask *task = gmpd_client_start_task(self,
 	                                     have_lock,
@@ -1291,12 +1371,12 @@ gmpd_client_noidle(GMpdClient *self)
 }
 
 static GTask *
-gmpd_client_start_task(GMpdClient *self,
-                       gboolean have_lock,
-                       GMpdTaskData *task_data,
-                       GCancellable *cancellable,
+gmpd_client_start_task(GMpdClient         *self,
+                       gboolean            have_lock,
+                       GMpdTaskData       *task_data,
+                       GCancellable       *cancellable,
                        GAsyncReadyCallback callback,
-                       gpointer user_data)
+                       gpointer            user_data)
 {
 	GTask *task;
 
@@ -1450,7 +1530,9 @@ gmpd_client_enable_timeout(GMpdClient *self)
 }
 
 static gboolean
-gmpd_client_do_flush(GMpdClient *self, GCancellable *cancellable, GError **error)
+gmpd_client_do_flush(GMpdClient   *self,
+                     GCancellable *cancellable,
+                     GError      **error)
 {
 	GError *err = NULL;
 	gboolean result;
@@ -1488,7 +1570,9 @@ gmpd_client_do_flush(GMpdClient *self, GCancellable *cancellable, GError **error
 }
 
 static gboolean
-gmpd_client_do_fill(GMpdClient *self, GCancellable *cancellable, GError **error)
+gmpd_client_do_fill(GMpdClient   *self,
+                    GCancellable *cancellable,
+                    GError      **error)
 {
 	GTask *task;
 
@@ -1546,11 +1630,11 @@ gmpd_client_do_fill(GMpdClient *self, GCancellable *cancellable, GError **error)
 }
 
 static gboolean
-gmpd_client_do_sync(GMpdClient *self,
-                    GIOCondition condition,
-                    gboolean blocking_io,
+gmpd_client_do_sync(GMpdClient   *self,
+                    GIOCondition  condition,
+                    gboolean      blocking_io,
                     GCancellable *cancellable,
-                    GError **error)
+                    GError      **error)
 {
 	g_return_val_if_fail(GMPD_IS_CLIENT(self), FALSE);
 	g_return_val_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable), FALSE);
@@ -1572,7 +1656,9 @@ gmpd_client_do_sync(GMpdClient *self,
 }
 
 static gboolean
-gmpd_client_on_socket_ready(GSocket *socket, GIOCondition condition, GMpdClient *self)
+gmpd_client_on_socket_ready(GSocket     *socket,
+                            GIOCondition condition,
+                            GMpdClient  *self)
 {
 	g_return_val_if_fail(G_IS_SOCKET(socket), G_SOURCE_REMOVE);
 	g_return_val_if_fail(GMPD_IS_CLIENT(self), G_SOURCE_REMOVE);
