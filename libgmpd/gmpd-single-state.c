@@ -17,63 +17,60 @@
  */
 
 #include <gio/gio.h>
-#include "gmpd-option-state.h"
+#include "gmpd-single-state.h"
 
-static const GEnumValue OPTION_STATE_VALUES[] = {
-	{GMPD_OPTION_UNKNOWN,  "GMPD_OPTION_UNKNOWN",  "option-unknown"},
-	{GMPD_OPTION_DISABLED, "GMPD_OPTION_DISABLED", "option-disabled"},
-	{GMPD_OPTION_ONESHOT,  "GMPD_OPTION_ONESHOT",  "option-oneshot"},
-	{GMPD_OPTION_ENABLED,  "GMPD_OPTION_ENABLED",  "option-enabled"},
+static const GEnumValue SINGLE_STATE_VALUES[] = {
+	{GMPD_SINGLE_DISABLED, "GMPD_SINGLE_DISABLED", "single-disabled"},
+	{GMPD_SINGLE_ONESHOT,  "GMPD_SINGLE_ONESHOT",  "single-oneshot"},
+	{GMPD_SINGLE_ENABLED,  "GMPD_SINGLE_ENABLED",  "single-enabled"},
 	{0, NULL, NULL}
 };
 
 GType
-gmpd_option_state_get_type(void)
+gmpd_single_state_get_type(void)
 {
 	static gsize init = 0;
 	static GType type = 0;
 
 	if (g_once_init_enter(&init)) {
-		type = g_enum_register_static("GMpdOptionState", OPTION_STATE_VALUES);
+		type = g_enum_register_static("GMpdSingleState", SINGLE_STATE_VALUES);
 		g_once_init_leave(&init, 1);
 	}
 
 	return type;
 }
 
-GMpdOptionState
-gmpd_option_state_from_string(const gchar *s)
+GMpdSingleState
+gmpd_single_state_from_string(const gchar *s)
 {
 	if (g_strcmp0(s, "0") == 0)
-		return GMPD_OPTION_DISABLED;
+		return GMPD_SINGLE_DISABLED;
 
 	else if (g_strcmp0(s, "1") == 0)
-		return GMPD_OPTION_ENABLED;
+		return GMPD_SINGLE_ENABLED;
 
 	else if (g_strcmp0(s, "oneshot") == 0)
-		return GMPD_OPTION_ONESHOT;
+		return GMPD_SINGLE_ONESHOT;
 
 	else
-		return GMPD_OPTION_UNKNOWN;
+		return GMPD_SINGLE_DISABLED;
 }
 
 gchar *
-gmpd_option_state_to_string(GMpdOptionState state)
+gmpd_single_state_to_string(GMpdSingleState state)
 {
 	switch (state) {
-	case GMPD_OPTION_UNKNOWN:
-		return NULL;
-
-	case GMPD_OPTION_DISABLED:
+	case GMPD_SINGLE_DISABLED:
 		return g_strdup("0");
 
-	case GMPD_OPTION_ONESHOT:
+	case GMPD_SINGLE_ENABLED:
+		return g_strdup("1");
+
+	case GMPD_SINGLE_ONESHOT:
 		return g_strdup("oneshot");
 
-	case GMPD_OPTION_ENABLED:
-		return g_strdup("1");
+	default:
+		g_return_val_if_reached(NULL);
 	}
-
-	g_return_val_if_reached(NULL);
 }
 

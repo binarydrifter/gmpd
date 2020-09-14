@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef __GMPD_OPTION_STATE_H__
-#define __GMPD_OPTION_STATE_H__
+#ifndef __GMPD_SINGLE_STATE_H__
+#define __GMPD_SINGLE_STATE_H__
 
 #if !defined(__GMPD_H_INSIDE__) && !defined(__GMPD_BUILD__)
 #   error "Only <gmpd.h> can be included directly."
@@ -27,25 +27,23 @@
 
 G_BEGIN_DECLS
 
-#define GMPD_TYPE_OPTION_STATE \
-	(gmpd_option_state_get_type())
+#define GMPD_TYPE_SINGLE_STATE \
+	(gmpd_single_state_get_type())
 
-#define GMPD_IS_OPTION_STATE(state) \
-	((state) >= GMPD_OPTION_UNKNOWN && (state) <= GMPD_OPTION_ENABLED)
+#define GMPD_IS_SINGLE_STATE(state) \
+	((state) >= GMPD_SINGLE_DISABLED && (state) <= GMPD_SINGLE_ONESHOT)
 
-typedef enum _GMpdOptionState {
-	GMPD_OPTION_UNKNOWN = -1,
-	GMPD_OPTION_DISABLED,
-	GMPD_OPTION_ONESHOT,
-	GMPD_OPTION_ENABLED,
-} GMpdOptionState;
+typedef enum _GMpdSingleState {
+	GMPD_SINGLE_DISABLED,
+	GMPD_SINGLE_ENABLED,
+	GMPD_SINGLE_ONESHOT,
+} GMpdSingleState;
 
-GType            gmpd_option_state_get_type     (void);
+GType           gmpd_single_state_get_type    (void);
 
-GMpdOptionState  gmpd_option_state_from_string  (const gchar    *s);
-gchar *          gmpd_option_state_to_string    (GMpdOptionState state);
+GMpdSingleState gmpd_single_state_from_string (const gchar    *s);
+gchar *         gmpd_single_state_to_string   (GMpdSingleState state);
 
 G_END_DECLS
 
-#endif /* __GMPD_OPTION_STATE_H__ */
-
+#endif /* __GMPD_SINGLE_STATE_H__ */

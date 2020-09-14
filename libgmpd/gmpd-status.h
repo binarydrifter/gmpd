@@ -25,8 +25,8 @@
 
 #include <gio/gio.h>
 #include <gmpd-audio-format.h>
-#include <gmpd-option-state.h>
 #include <gmpd-playback-state.h>
+#include <gmpd-single-state.h>
 
 G_BEGIN_DECLS
 
@@ -62,16 +62,16 @@ void               gmpd_status_set_volume            (GMpdStatus        *self,
                                                       gint8              volume);
 
 void               gmpd_status_set_repeat            (GMpdStatus        *self,
-                                                      GMpdOptionState    repeat);
+                                                      gboolean           repeat);
 
 void               gmpd_status_set_random            (GMpdStatus        *self,
-                                                      GMpdOptionState    random);
+                                                      gboolean           random);
 
 void               gmpd_status_set_single            (GMpdStatus        *self,
-                                                      GMpdOptionState    single);
+                                                      GMpdSingleState    single);
 
 void               gmpd_status_set_consume           (GMpdStatus        *self,
-                                                      GMpdOptionState    consume);
+                                                      gboolean           consume);
 
 void               gmpd_status_set_queue_version     (GMpdStatus        *self,
                                                       guint              queue_version);
@@ -123,10 +123,10 @@ void               gmpd_status_set_error             (GMpdStatus        *self,
 
 gchar *            gmpd_status_get_partition         (GMpdStatus        *self);
 gint8              gmpd_status_get_volume            (GMpdStatus        *self);
-GMpdOptionState    gmpd_status_get_repeat            (GMpdStatus        *self);
-GMpdOptionState    gmpd_status_get_random            (GMpdStatus        *self);
-GMpdOptionState    gmpd_status_get_single            (GMpdStatus        *self);
-GMpdOptionState    gmpd_status_get_consume           (GMpdStatus        *self);
+gboolean           gmpd_status_get_repeat            (GMpdStatus        *self);
+gboolean           gmpd_status_get_random            (GMpdStatus        *self);
+GMpdSingleState    gmpd_status_get_single            (GMpdStatus        *self);
+gboolean           gmpd_status_get_consume           (GMpdStatus        *self);
 guint              gmpd_status_get_queue_version     (GMpdStatus        *self);
 guint              gmpd_status_get_queue_length      (GMpdStatus        *self);
 GMpdPlaybackState  gmpd_status_get_playback          (GMpdStatus        *self);

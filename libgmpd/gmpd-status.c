@@ -18,8 +18,8 @@
 
 #include <gio/gio.h>
 #include "gmpd-audio-format.h"
-#include "gmpd-option-state.h"
 #include "gmpd-playback-state.h"
+#include "gmpd-single-state.h"
 #include "gmpd-response.h"
 #include "gmpd-status.h"
 #include "gmpd-version.h"
@@ -58,10 +58,10 @@ struct _GMpdStatus {
 	GObject           __base__;
 	gchar            *partition;
 	gint8             volume;
-	GMpdOptionState   repeat;
-	GMpdOptionState   random;
-	GMpdOptionState   single;
-	GMpdOptionState   consume;
+	gboolean          repeat;
+	gboolean          random;
+	GMpdSingleState   single;
+	gboolean          consume;
 	guint             queue_version;
 	guint             queue_length;
 	GMpdPlaybackState playback;
@@ -113,16 +113,16 @@ gmpd_status_response_feed_pair(GMpdResponse *response,
 		gmpd_status_set_volume(self, g_ascii_strtoll(value, NULL, 10));
 
 	} else if (g_strcmp0(key, "repeat") == 0) {
-		gmpd_status_set_repeat(self, gmpd_option_state_from_string(value));
+		gmpd_status_set_repeat(self, !!g_ascii_strtoull(value, NULL, 10));
 
 	} else if (g_strcmp0(key, "random") == 0) {
-		gmpd_status_set_random(self, gmpd_option_state_from_string(value));
+		gmpd_status_set_random(self, !!g_ascii_strtoull(value, NULL, 10));
 
 	} else if (g_strcmp0(key, "single") == 0) {
-		gmpd_status_set_single(self, gmpd_option_state_from_string(value));
+		gmpd_status_set_single(self, gmpd_single_state_from_string(value));
 
 	} else if (g_strcmp0(key, "consume") == 0) {
-		gmpd_status_set_consume(self, gmpd_option_state_from_string(value));
+		gmpd_status_set_consume(self, !!g_ascii_strtoull(value, NULL, 10));
 
 	} else if (g_strcmp0(key, "playlist") == 0) {
 		gmpd_status_set_queue_version(self, g_ascii_strtoull(value, NULL, 10));
@@ -204,11 +204,11 @@ gmpd_status_set_property(GObject      *object,
 		break;
 
 	case PROP_REPEAT:
-		gmpd_status_set_repeat(self, g_value_get_enum(value));
+		gmpd_status_set_repeat(self, g_value_get_boolean(value));
 		break;
 
 	case PROP_RANDOM:
-		gmpd_status_set_random(self, g_value_get_enum(value));
+		gmpd_status_set_random(self, g_value_get_boolean(value));
 		break;
 
 	case PROP_SINGLE:
@@ -216,7 +216,7 @@ gmpd_status_set_property(GObject      *object,
 		break;
 
 	case PROP_CONSUME:
-		gmpd_status_set_consume(self, g_value_get_enum(value));
+		gmpd_status_set_consume(self, g_value_get_boolean(value));
 		break;
 
 	case PROP_QUEUE_VERSION:
@@ -306,11 +306,11 @@ gmpd_status_get_property(GObject    *object,
 		break;
 
 	case PROP_REPEAT:
-		g_value_set_enum(value, gmpd_status_get_repeat(self));
+		g_value_set_boolean(value, gmpd_status_get_repeat(self));
 		break;
 
 	case PROP_RANDOM:
-		g_value_set_enum(value, gmpd_status_get_random(self));
+		g_value_set_boolean(value, gmpd_status_get_random(self));
 		break;
 
 	case PROP_SINGLE:
@@ -318,7 +318,7 @@ gmpd_status_get_property(GObject    *object,
 		break;
 
 	case PROP_CONSUME:
-		g_value_set_enum(value, gmpd_status_get_consume(self));
+		g_value_set_boolean(value, gmpd_status_get_consume(self));
 		break;
 
 	case PROP_QUEUE_VERSION:
@@ -433,44 +433,41 @@ gmpd_status_class_init(GMpdStatusClass *klass)
 		                 G_PARAM_STATIC_STRINGS);
 
 	PROPERTIES[PROP_REPEAT] =
-		g_param_spec_enum("repeat",
-		                  "Repeat",
-		                  "State of the repeat option",
-		                  GMPD_TYPE_OPTION_STATE,
-		                  GMPD_OPTION_UNKNOWN,
-		                  G_PARAM_READWRITE |
-		                  G_PARAM_EXPLICIT_NOTIFY |
-		                  G_PARAM_STATIC_STRINGS);
+		g_param_spec_boolean("repeat",
+		                     "Repeat",
+		                     "State of the repeat option",
+		                     FALSE,
+		                     G_PARAM_READWRITE |
+		                     G_PARAM_EXPLICIT_NOTIFY |
+		                     G_PARAM_STATIC_STRINGS);
 
 	PROPERTIES[PROP_RANDOM] =
-		g_param_spec_enum("random",
-		                  "Random",
-		                  "State of the random option",
-		                  GMPD_TYPE_OPTION_STATE,
-		                  GMPD_OPTION_UNKNOWN,
-		                  G_PARAM_READWRITE |
-		                  G_PARAM_EXPLICIT_NOTIFY |
-		                  G_PARAM_STATIC_STRINGS);
+		g_param_spec_boolean("random",
+		                     "Random",
+		                     "State of the random option",
+		                     FALSE,
+		                     G_PARAM_READWRITE |
+		                     G_PARAM_EXPLICIT_NOTIFY |
+		                     G_PARAM_STATIC_STRINGS);
 
 	PROPERTIES[PROP_SINGLE] =
 		g_param_spec_enum("single",
 		                  "Single",
 		                  "State of the single option",
-		                  GMPD_TYPE_OPTION_STATE,
-		                  GMPD_OPTION_UNKNOWN,
+		                  GMPD_TYPE_SINGLE_STATE,
+		                  GMPD_SINGLE_DISABLED,
 		                  G_PARAM_READWRITE |
 		                  G_PARAM_EXPLICIT_NOTIFY |
 		                  G_PARAM_STATIC_STRINGS);
 
 	PROPERTIES[PROP_CONSUME] =
-		g_param_spec_enum("consume",
-		                  "Consume",
-		                  "State of the consume option",
-		                  GMPD_TYPE_OPTION_STATE,
-		                  GMPD_OPTION_UNKNOWN,
-		                  G_PARAM_READWRITE |
-		                  G_PARAM_EXPLICIT_NOTIFY |
-		                  G_PARAM_STATIC_STRINGS);
+		g_param_spec_boolean("consume",
+		                     "Consume",
+		                     "State of the consume option",
+		                     FALSE,
+		                     G_PARAM_READWRITE |
+		                     G_PARAM_EXPLICIT_NOTIFY |
+		                     G_PARAM_STATIC_STRINGS);
 
 	PROPERTIES[PROP_QUEUE_VERSION] =
 		g_param_spec_uint("queue-version",
@@ -626,10 +623,10 @@ gmpd_status_init(GMpdStatus *self)
 {
 	self->partition = NULL;
 	self->volume = -1;
-	self->repeat = GMPD_OPTION_UNKNOWN;
-	self->random = GMPD_OPTION_UNKNOWN;
-	self->single = GMPD_OPTION_UNKNOWN;
-	self->consume = GMPD_OPTION_UNKNOWN;
+	self->repeat = FALSE;
+	self->random = FALSE;
+	self->single = GMPD_SINGLE_DISABLED;
+	self->consume = FALSE;
 	self->queue_version = 0;
 	self->queue_length = 0;
 	self->playback = GMPD_PLAYBACK_UNKNOWN;
@@ -679,38 +676,32 @@ gmpd_status_set_volume(GMpdStatus *self,
 
 void
 gmpd_status_set_repeat(GMpdStatus     *self,
-                       GMpdOptionState repeat)
+                       gboolean        repeat)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
-	if (!GMPD_IS_OPTION_STATE(repeat))
-		repeat = GMPD_OPTION_UNKNOWN;
-
-	self->repeat = repeat;
+	self->repeat = !!repeat;
 	g_object_notify_by_pspec(G_OBJECT(self), PROPERTIES[PROP_REPEAT]);
 }
 
 void
 gmpd_status_set_random(GMpdStatus     *self,
-                       GMpdOptionState random)
+                       gboolean        random)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
-	if (!GMPD_IS_OPTION_STATE(random))
-		random = GMPD_OPTION_UNKNOWN;
-
-	self->random = random;
+	self->random = !!random;
 	g_object_notify_by_pspec(G_OBJECT(self), PROPERTIES[PROP_RANDOM]);
 }
 
 void
 gmpd_status_set_single(GMpdStatus     *self,
-                       GMpdOptionState single)
+                       GMpdSingleState single)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
 
-	if (!GMPD_IS_OPTION_STATE(single))
-		single = GMPD_OPTION_UNKNOWN;
+	if (!GMPD_IS_SINGLE_STATE(single))
+		single = GMPD_SINGLE_DISABLED;
 
 	self->single = single;
 	g_object_notify_by_pspec(G_OBJECT(self), PROPERTIES[PROP_SINGLE]);
@@ -718,15 +709,11 @@ gmpd_status_set_single(GMpdStatus     *self,
 
 void
 gmpd_status_set_consume(GMpdStatus     *self,
-                        GMpdOptionState consume)
+                        gboolean        consume)
 {
 	g_return_if_fail(GMPD_IS_STATUS(self));
-	g_return_if_fail(GMPD_IS_OPTION_STATE(consume));
 
-	if (!GMPD_IS_OPTION_STATE(consume))
-		consume = GMPD_OPTION_UNKNOWN;
-
-	self->consume = consume;
+	self->consume = !!consume;
 	g_object_notify_by_pspec(G_OBJECT(self), PROPERTIES[PROP_CONSUME]);
 }
 
@@ -920,31 +907,31 @@ gmpd_status_get_volume(GMpdStatus *self)
 	return self->volume;
 }
 
-GMpdOptionState
+gboolean
 gmpd_status_get_repeat(GMpdStatus *self)
 {
-	g_return_val_if_fail(GMPD_IS_STATUS(self), GMPD_OPTION_UNKNOWN);
+	g_return_val_if_fail(GMPD_IS_STATUS(self), FALSE);
 	return self->repeat;
 }
 
-GMpdOptionState
+gboolean
 gmpd_status_get_random(GMpdStatus *self)
 {
-	g_return_val_if_fail(GMPD_IS_STATUS(self), GMPD_OPTION_UNKNOWN);
+	g_return_val_if_fail(GMPD_IS_STATUS(self), FALSE);
 	return self->random;
 }
 
-GMpdOptionState
+GMpdSingleState
 gmpd_status_get_single(GMpdStatus *self)
 {
-	g_return_val_if_fail(GMPD_IS_STATUS(self), GMPD_OPTION_UNKNOWN);
+	g_return_val_if_fail(GMPD_IS_STATUS(self), GMPD_SINGLE_DISABLED);
 	return self->single;
 }
 
-GMpdOptionState
+gboolean
 gmpd_status_get_consume(GMpdStatus *self)
 {
-	g_return_val_if_fail(GMPD_IS_STATUS(self), GMPD_OPTION_UNKNOWN);
+	g_return_val_if_fail(GMPD_IS_STATUS(self), FALSE);
 	return self->consume;
 }
 

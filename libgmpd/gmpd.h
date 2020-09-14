@@ -31,8 +31,8 @@ G_BEGIN_DECLS
 #include <gmpd-error.h>
 #include <gmpd-idle.h>
 #include <gmpd-object.h>
-#include <gmpd-option-state.h>
 #include <gmpd-playback-state.h>
+#include <gmpd-single-state.h>
 #include <gmpd-song.h>
 #include <gmpd-stats.h>
 #include <gmpd-status.h>
