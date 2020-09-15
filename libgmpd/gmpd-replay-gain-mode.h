@@ -16,34 +16,36 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef __GMPD_H__
-#define __GMPD_H__
+#ifndef __GMPD_REPLAY_GAIN_MODE_H__
+#define __GMPD_REPLAY_GAIN_MODE_H__
+
+#if !defined(__GMPD_H_INSIDE__) && !defined(__GMPD_BUILD__)
+#   error "Only <gmpd.h> can be included directly."
+#endif
 
 #include <gio/gio.h>
 
 G_BEGIN_DECLS
 
-#define __GMPD_H_INSIDE__
+#define GMPD_TYPE_REPLAY_GAIN_MODE \
+	(gmpd_replay_gain_mode_get_type())
 
-#include <gmpd-audio-format.h>
-#include <gmpd-client.h>
-#include <gmpd-entity.h>
-#include <gmpd-error.h>
-#include <gmpd-idle.h>
-#include <gmpd-object.h>
-#include <gmpd-playback-state.h>
-#include <gmpd-replay-gain-mode.h>
-#include <gmpd-replay-gain-status.h>
-#include <gmpd-single-state.h>
-#include <gmpd-song.h>
-#include <gmpd-stats.h>
-#include <gmpd-status.h>
-#include <gmpd-tag.h>
-#include <gmpd-version.h>
+#define GMPD_IS_REPLAY_GAIN_MODE(m) \
+	((m) >= GMPD_REPLAY_GAIN_OFF && (m) <= GMPD_REPLAY_GAIN_AUTO)
 
-#undef __GMPD_H_INSIDE__
+typedef enum _GMpdReplayGainMode {
+	GMPD_REPLAY_GAIN_OFF,
+	GMPD_REPLAY_GAIN_TRACK,
+	GMPD_REPLAY_GAIN_ALBUM,
+	GMPD_REPLAY_GAIN_AUTO,
+} GMpdReplayGainMode;
+
+GType              gmpd_replay_gain_mode_get_type    (void);
+
+GMpdReplayGainMode gmpd_replay_gain_mode_from_string (const gchar       *string);
+gchar *            gmpd_replay_gain_mode_to_string   (GMpdReplayGainMode mode);
 
 G_END_DECLS
 
-#endif /* __GMPD_H__ */
+#endif /* __GMPD_REPLAY_GAIN_MODE_H__ */
 

@@ -20,6 +20,8 @@
 #include "gmpd-idle.h"
 #include "gmpd-idle-response.h"
 #include "gmpd-protocol.h"
+#include "gmpd-replay-gain-mode.h"
+#include "gmpd-replay-gain-status.h"
 #include "gmpd-response.h"
 #include "gmpd-song.h"
 #include "gmpd-stats.h"
@@ -113,5 +115,32 @@ GMpdTaskData *
 gmpd_protocol_close(void)
 {
 	return gmpd_task_data_new(g_strdup("close\n"), NULL);
+}
+
+GMpdTaskData *
+gmpd_protocol_replay_gain_mode(GMpdReplayGainMode mode)
+{
+	gchar *mode_str;
+	gchar *command;
+
+	GMpdTaskData *data;
+
+	g_return_val_if_fail(GMPD_IS_REPLAY_GAIN_MODE(mode), NULL);
+
+	mode_str = gmpd_replay_gain_mode_to_string(mode);
+	command = g_strdup_printf("replay_gain_mode %s\n", mode_str);
+
+	data = gmpd_task_data_new(command, GMPD_RESPONSE(gmpd_void_response_new()));
+
+	g_free(mode_str);
+
+	return data;
+}
+
+GMpdTaskData *
+gmpd_protocol_replay_gain_status(void)
+{
+	return gmpd_task_data_new(g_strdup("replay_gain_status\n"),
+	                          GMPD_RESPONSE(gmpd_replay_gain_status_new()));
 }
 

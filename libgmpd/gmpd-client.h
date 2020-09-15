@@ -25,6 +25,8 @@
 
 #include <gio/gio.h>
 #include <gmpd-idle.h>
+#include <gmpd-replay-gain-mode.h>
+#include <gmpd-replay-gain-status.h>
 #include <gmpd-song.h>
 #include <gmpd-stats.h>
 #include <gmpd-status.h>
@@ -150,6 +152,29 @@ void            gmpd_client_stats_async             (GMpdClient          *self,
                                                      GAsyncReadyCallback  callback,
                                                      gpointer             user_data);
 
+/*
+ * Playback Options
+ */
+
+gboolean        gmpd_client_replay_gain_mode        (GMpdClient          *self,
+                                                     GMpdReplayGainMode   mode,
+                                                     GCancellable        *cancellable,
+                                                     GError             **error);
+
+void            gmpd_client_replay_gain_mode_async  (GMpdClient          *self,
+                                                     GMpdReplayGainMode   mode,
+                                                     GCancellable        *cancellable,
+                                                     GAsyncReadyCallback  callback,
+                                                     gpointer             user_data);
+
+GMpdReplayGainStatus * gmpd_client_replay_gain_status       (GMpdClient          *self,
+                                                             GCancellable        *cancellable,
+                                                             GError             **error);
+
+void                   gmpd_client_replay_gain_status_async (GMpdClient          *self,
+                                                             GCancellable        *cancellable,
+                                                             GAsyncReadyCallback  callback,
+                                                             gpointer             user_data);
 
 /*
  * Responses
@@ -173,6 +198,10 @@ GMpdStats *     gmpd_client_finish_stats_response   (GMpdClient          *self,
 gboolean        gmpd_client_finish_void_response    (GMpdClient          *self,
                                                      GAsyncResult        *result,
                                                      GError             **error);
+
+GMpdReplayGainStatus * gmpd_client_finish_replay_gain_status_response (GMpdClient    *self,
+                                                                       GAsyncResult  *result,
+                                                                       GError       **error);
 
 G_END_DECLS
 

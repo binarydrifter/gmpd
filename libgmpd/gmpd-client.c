@@ -831,6 +831,99 @@ gmpd_client_stats_async(GMpdClient         *self,
 	                           user_data);
 }
 
+gboolean
+gmpd_client_replay_gain_mode(GMpdClient        *self,
+                             GMpdReplayGainMode mode,
+                             GCancellable      *cancellable,
+                             GError           **error)
+{
+	GMpdResponse *response;
+	GError *err = NULL;
+	gboolean retval;
+
+	g_return_val_if_fail(GMPD_IS_CLIENT(self), FALSE);
+	g_return_val_if_fail(GMPD_IS_REPLAY_GAIN_MODE(mode), FALSE);
+	g_return_val_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable), FALSE);
+	g_return_val_if_fail(error == NULL || *error == NULL, FALSE);
+
+	response = gmpd_client_run_task(self,
+	                                FALSE,
+	                                gmpd_protocol_replay_gain_mode(mode),
+	                                cancellable,
+	                                &err);
+
+	g_clear_object(&response);
+
+	if (err) {
+		retval = FALSE;
+		g_propagate_error(error, err);
+	} else {
+		retval = TRUE;
+	}
+
+	return retval;
+}
+
+void
+gmpd_client_replay_gain_mode_async(GMpdClient         *self,
+                                   GMpdReplayGainMode  mode,
+                                   GCancellable       *cancellable,
+                                   GAsyncReadyCallback callback,
+                                   gpointer            user_data)
+{
+	g_return_if_fail(GMPD_IS_CLIENT(self));
+	g_return_if_fail(GMPD_IS_REPLAY_GAIN_MODE(mode));
+	g_return_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable));
+	g_return_if_fail(callback != NULL || user_data == NULL);
+
+	gmpd_client_run_task_async(self,
+	                           FALSE,
+	                           gmpd_protocol_replay_gain_mode(mode),
+	                           cancellable,
+	                           callback,
+	                           user_data);
+}
+
+GMpdReplayGainStatus *
+gmpd_client_replay_gain_status(GMpdClient   *self,
+                               GCancellable *cancellable,
+                               GError      **error)
+{
+	GMpdResponse *response;
+
+	g_return_val_if_fail(GMPD_IS_CLIENT(self), NULL);
+	g_return_val_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable), NULL);
+	g_return_val_if_fail(error == NULL || *error == NULL, NULL);
+
+	response = gmpd_client_run_task(self,
+	                                FALSE,
+	                                gmpd_protocol_replay_gain_status(),
+	                                cancellable,
+	                                error);
+
+	return response ? GMPD_REPLAY_GAIN_STATUS(response) : NULL;
+
+}
+
+void
+gmpd_client_replay_gain_status_async(GMpdClient         *self,
+                                     GCancellable       *cancellable,
+                                     GAsyncReadyCallback callback,
+                                     gpointer            user_data)
+{
+	g_return_if_fail(GMPD_IS_CLIENT(self));
+	g_return_if_fail(cancellable == NULL || G_IS_CANCELLABLE(cancellable));
+	g_return_if_fail(callback != NULL || user_data == NULL);
+
+	gmpd_client_run_task_async(self,
+	                           FALSE,
+	                           gmpd_protocol_replay_gain_status(),
+	                           cancellable,
+	                           callback,
+	                           user_data);
+
+}
+
 GMpdSong *
 gmpd_client_finish_song_response(GMpdClient   *self,
                                  GAsyncResult *result,
@@ -953,6 +1046,27 @@ gmpd_client_finish_void_response(GMpdClient   *self,
 	}
 
 	return retval;
+}
+
+GMpdReplayGainStatus *
+gmpd_client_finish_replay_gain_status_response(GMpdClient   *self,
+                                               GAsyncResult *result,
+                                               GError      **error)
+{
+	GTask *task;
+	GMpdReplayGainStatus *response;
+
+	g_return_val_if_fail(GMPD_IS_CLIENT(self), NULL);
+	g_return_val_if_fail(G_IS_TASK(result), NULL);
+	g_return_val_if_fail(error == NULL || *error == NULL, NULL);
+
+	task = G_TASK(result);
+	g_return_val_if_fail(g_task_get_source_object(task) == self, FALSE);
+
+	response = g_task_propagate_pointer(task, error);
+	g_return_val_if_fail(response == NULL || GMPD_IS_REPLAY_GAIN_STATUS(response), NULL);
+
+	return response;
 }
 
 static void

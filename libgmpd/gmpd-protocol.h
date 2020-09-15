@@ -25,6 +25,7 @@
 
 #include <gio/gio.h>
 #include <gmpd-idle.h>
+#include <gmpd-replay-gain-mode.h>
 #include <gmpd-response.h>
 #include <gmpd-version.h>
 
@@ -37,15 +38,17 @@ typedef struct _GMpdTaskData {
 	GError        *error;
 } GMpdTaskData;
 
-GMpdTaskData *  gmpd_task_data_ref         (GMpdTaskData *self);
-void            gmpd_task_data_unref       (GMpdTaskData *self);
+GMpdTaskData * gmpd_task_data_ref               (GMpdTaskData      *self);
+void           gmpd_task_data_unref             (GMpdTaskData      *self);
 
-GMpdTaskData *  gmpd_protocol_clearerror   (void);
-GMpdTaskData *  gmpd_protocol_currentsong  (void);
-GMpdTaskData *  gmpd_protocol_idle         (GMpdIdle      subsystems);
-GMpdTaskData *  gmpd_protocol_status       (void);
-GMpdTaskData *  gmpd_protocol_stats        (void);
-GMpdTaskData *  gmpd_protocol_close        (void);
+GMpdTaskData * gmpd_protocol_clearerror         (void);
+GMpdTaskData * gmpd_protocol_currentsong        (void);
+GMpdTaskData * gmpd_protocol_idle               (GMpdIdle           subsystems);
+GMpdTaskData * gmpd_protocol_status             (void);
+GMpdTaskData * gmpd_protocol_stats              (void);
+GMpdTaskData * gmpd_protocol_close              (void);
+GMpdTaskData * gmpd_protocol_replay_gain_mode   (GMpdReplayGainMode mode);
+GMpdTaskData * gmpd_protocol_replay_gain_status (void);
 
 G_END_DECLS
 
